@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+         stopOnError="true"
+>
+    <php>
+        <ini name="display_errors" value="On" />
+        <ini name="display_startup_errors" value="On" />
+        <ini name="error_reporting" value="On" />
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="SHELL_VERBOSITY" value="On" />
+        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
+        <ini name="xdebug.mode" value="coverage"/>
+        <ini name="xdebug.start_with_request" value="yes"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+
+    <coverage>
+        <report>
+            <clover outputFile="coverage/clover.xml"/>
+            <html outputDirectory="coverage"/>
+            <text outputFile="coverage/report.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+        </report>
+    </coverage>
+
+    <extensions>
+    </extensions>
+</phpunit>
