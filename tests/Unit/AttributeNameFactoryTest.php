@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tactix\Tests\Unit;
 
-use Tactix\Tests\Data\MyEntity;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Tactix\AttributeName;
 use Tactix\AttributeNameFactory;
+use Tactix\Tests\Data\MyEntity;
 
 class AttributeNameFactoryTest extends TestCase
 {
