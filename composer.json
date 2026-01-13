@@ -1,0 +1,43 @@
+{
+    "name": "makomweb/tactix",
+    "description": "Tooling for tactical domain driven design",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tactix\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tactix\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Martin Komischke",
+            "email": "martin.komischke@outlook.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+    },
+    "scripts": {
+        "qa": [
+            "vendor/bin/phpstan analyse --memory-limit=1G",
+            "vendor/bin/php-cs-fixer fix",
+            "vendor/bin/phpunit"
+        ],
+        "sa": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "test": "vendor/bin/phpunit",
+        "cs": "vendor/bin/php-cs-fixer fix"
+    },
+    "scripts-descriptions": {
+        "qa": "Run all QA tools. Bail out when an error occurs.",
+        "cs": "Run the code style fixer",
+        "sa": "Run the static analyzer",
+        "test": "Run all tests locally"
+    },
+    "require": {
+    }
+}
