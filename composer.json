@@ -21,6 +21,9 @@
     ],
     "minimum-stability": "stable",
     "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.5",
+        "friendsofphp/php-cs-fixer": "^3.92"
     },
     "scripts": {
         "qa": [
@@ -37,7 +40,5 @@
         "cs": "Run the code style fixer",
         "sa": "Run the static analyzer",
         "test": "Run all tests locally"
-    },
-    "require": {
     }
 }
