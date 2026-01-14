@@ -20,9 +20,9 @@ final class ForbiddenRelationsTest extends TestCase
             Check::folder($folder);
             self::fail('Should have thrown before!');
         } catch (FolderViolationException $ex) {
-            self::assertEquals(sprintf('Folder %s has 1 violation(s)!', $folder), $ex->getMessage());
+            self::assertSame(sprintf('Folder %s has 1 violation(s)!', $folder), $ex->getMessage());
             self::assertCount(1, $ex->violations);
-            self::assertEquals('(MyValueObject)-[consumes]->(MyEntity) is a forbidden relation! ❌', $ex->violations[0]->message);
+            self::assertSame('(MyValueObject)-[consumes]->(MyEntity) is a forbidden relation! ❌', $ex->violations[0]->message);
         }
     }
 }

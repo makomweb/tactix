@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Tactix\Check;
 use Tactix\ClassViolationException;
-use Tactix\Tests\Fixtures\MissingTag\MyWithoutTag;
+use Tactix\Tests\Data\MyWithoutTag;
 
 final class MissingTagTest extends TestCase
 {
@@ -19,7 +19,7 @@ final class MissingTagTest extends TestCase
             Check::className(MyWithoutTag::class);
             self::fail('Should have thrown before!');
         } catch (ClassViolationException $ex) {
-            self::assertSame('Class Tactix\Tests\Fixtures\MissingTag\MyWithoutTag has 1 violation(s)!', $ex->getMessage());
+            self::assertSame('Class Tactix\Tests\Data\MyWithoutTag has 1 violation(s)!', $ex->getMessage());
             self::assertCount(1, $ex->violations);
             self::assertStringContainsString('has no tactical tag', (string) $ex->violations[0]);
         }

@@ -48,7 +48,7 @@ final readonly class YieldViolations
         }
 
         /* Exceptions are value objects. It is not required that they carry this tag. */
-        if (str_contains($className, 'Exception')) {
+        if (str_ends_with($className, 'Exception')) {
             return;
         }
 

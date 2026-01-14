@@ -9,7 +9,7 @@ use Tactix\Analyzer\Class\NameType;
 
 final readonly class MyNodeFactory
 {
-    public static function creatNode(Result $result, AnalyzerClassName $name): MyNode
+    public static function createNode(Result $result, AnalyzerClassName $name): MyNode
     {
         if ($name->isStandardName()) {
             return new MyNode((string) $name);
@@ -28,6 +28,10 @@ final readonly class MyNodeFactory
             if ($using->name === $name) {
                 return new MyNode($using->fqcn);
             }
+        }
+
+        if (null === $result->namespace || '' === $result->namespace) {
+            return new MyNode($name);
         }
 
         /*

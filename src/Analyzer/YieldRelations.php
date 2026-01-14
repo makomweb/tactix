@@ -46,7 +46,7 @@ final readonly class YieldRelations
             yield MyRelation::create(
                 new MyNode($result->fullQualifiedClassName),
                 $edge,
-                MyNodeFactory::creatNode($result, $target)
+                MyNodeFactory::createNode($result, $target)
             );
         }
     }
@@ -60,7 +60,7 @@ final readonly class YieldRelations
             yield MyRelation::create(
                 new MyNode($result->fullQualifiedClassName),
                 MyEdge::CONSUMES,
-                MyNodeFactory::creatNode($result, $argument->type)
+                MyNodeFactory::createNode($result, $argument->type)
             );
         }
 
@@ -69,7 +69,7 @@ final readonly class YieldRelations
             yield MyRelation::create(
                 new MyNode($result->fullQualifiedClassName),
                 MyEdge::PRODUCES,
-                MyNodeFactory::creatNode($result, $method->returnType->typeName)
+                MyNodeFactory::createNode($result, $method->returnType->typeName)
             );
         }
 
@@ -77,7 +77,7 @@ final readonly class YieldRelations
             yield MyRelation::create(
                 new MyNode($result->fullQualifiedClassName),
                 MyEdge::THROWS,
-                MyNodeFactory::creatNode($result, $exception)
+                MyNodeFactory::createNode($result, $exception)
             );
         }
     }
