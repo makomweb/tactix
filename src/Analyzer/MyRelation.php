@@ -12,30 +12,22 @@ final readonly class MyRelation implements \Stringable
 {
     private function __construct(
         public MyNode $from,
-        private ?AttributeName $fromAttribute,
         public MyEdge $edge,
         public MyNode $to,
-        private ?AttributeName $toAttribute,
-        public bool $isForbidden,
     ) {
     }
 
     public static function create(MyNode $from, MyEdge $edge, MyNode $to): self
     {
-        /** @var class-string $fromClass */
-        $fromClass = $from->fqcn;
-        $fromAttribute = AttributeNameFactory::fromClassOrNull($fromClass);
+        return new self($from, $edge, $to);
+    }
 
-        /** @var class-string $toClass */
-        $toClass = $to->fqcn;
-        $toAttribute = AttributeNameFactory::fromClassOrNull($toClass);
+    public function isForbidden(): bool
+    {
+        $from = $this->getFromAttribute();
+        $to = $this->getToAttribute();
 
-        $isForbidden =
-            !is_null($fromAttribute)
-            && !is_null($toAttribute)
-            && Forbidden::check($fromAttribute, $toAttribute);
-
-        return new self($from, $fromAttribute, $edge, $to, $toAttribute, $isForbidden);
+        return $from && $to && Forbidden::check($from, $to);
     }
 
     public function equals(self $other): bool
@@ -52,11 +44,24 @@ final readonly class MyRelation implements \Stringable
 
     public function toTacticalString(): string
     {
-        if (is_null($this->fromAttribute) || is_null($this->toAttribute)) {
+        $from = $this->getFromAttribute();
+        $to = $this->getToAttribute();
+
+        if (!$from || !$to) {
             throw new \InvalidArgumentException(sprintf('Either "%s" or "%s" does not have a tactical attribute!', $this->from, $this->to));
         }
 
-        return sprintf('%s %s %s', $this->fromAttribute->value, $this->edge->value, $this->toAttribute->value);
+        return sprintf('%s %s %s', $from->value, $this->edge->value, $to->value);
+    }
+
+    public function getFromAttribute(): ?AttributeName
+    {
+        return AttributeNameFactory::fromClassOrNull($this->from->fqcn);
+    }
+
+    public function getToAttribute(): ?AttributeName
+    {
+        return AttributeNameFactory::fromClassOrNull($this->to->fqcn);
     }
 
     public function __toString(): string

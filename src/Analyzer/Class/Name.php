@@ -31,28 +31,28 @@ final readonly class Name implements \Stringable
     ];
 
     public function __construct(
-        public string $name,
+        public string $value,
         public NameType $type,
     ) {
     }
 
     public function isStandardName(): bool
     {
-        return in_array($this->name, self::STANDARD_NAMES, true);
+        return in_array($this->value, self::STANDARD_NAMES, true);
     }
 
     public function isArray(): bool
     {
-        return 'array' === $this->name;
+        return 'array' === $this->value;
     }
 
     public function isGenerator(): bool
     {
-        return 'Generator' === $this->name || '\\Generator' === $this->name;
+        return 'Generator' === $this->value || '\\Generator' === $this->value;
     }
 
     public function __toString(): string
     {
-        return $this->name;
+        return $this->value;
     }
 }

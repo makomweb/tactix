@@ -44,7 +44,7 @@ final readonly class YieldRelations
     {
         foreach ($targets as $target) {
             yield MyRelation::create(
-                new MyNode($result->fullQualifiedClassName),
+                MyNode::fromString($result->fullQualifiedClassName),
                 $edge,
                 MyNodeFactory::createNode($result, $target)
             );
@@ -58,7 +58,7 @@ final readonly class YieldRelations
     {
         foreach ($method->arguments as $argument) {
             yield MyRelation::create(
-                new MyNode($result->fullQualifiedClassName),
+                MyNode::fromString($result->fullQualifiedClassName),
                 MyEdge::CONSUMES,
                 MyNodeFactory::createNode($result, $argument->type)
             );
@@ -67,7 +67,7 @@ final readonly class YieldRelations
         if (!$method->returnType->canBeIgnored()) {
             assert($method->returnType->typeName instanceof Name);
             yield MyRelation::create(
-                new MyNode($result->fullQualifiedClassName),
+                MyNode::fromString($result->fullQualifiedClassName),
                 MyEdge::PRODUCES,
                 MyNodeFactory::createNode($result, $method->returnType->typeName)
             );
@@ -75,7 +75,7 @@ final readonly class YieldRelations
 
         foreach ($method->throws as $exception) {
             yield MyRelation::create(
-                new MyNode($result->fullQualifiedClassName),
+                MyNode::fromString($result->fullQualifiedClassName),
                 MyEdge::THROWS,
                 MyNodeFactory::createNode($result, $exception)
             );

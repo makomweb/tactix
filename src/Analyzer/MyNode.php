@@ -4,10 +4,28 @@ declare(strict_types=1);
 
 namespace Tactix\Analyzer;
 
+use Tactix\Analyzer\Class\Name;
+
 final readonly class MyNode implements \Stringable
 {
-    public function __construct(public string $fqcn)
+    /**
+     * @param class-string $fqcn
+     */
+    private function __construct(public string $fqcn)
     {
+    }
+
+    public static function fromName(Name $name): self
+    {
+        return self::fromString((string) $name);
+    }
+
+    public static function fromString(string $name): self
+    {
+        /** @var class-string $value */
+        $value = (string) $name;
+
+        return new self($value);
     }
 
     public function getName(): string

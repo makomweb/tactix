@@ -22,6 +22,7 @@ use Tactix\Analyzer\Class\Method;
 use Tactix\Analyzer\Class\Name as AnalyzerClassName;
 use Tactix\Analyzer\Class\NameType;
 use Tactix\Analyzer\Class\ReturnType;
+use Tactix\Analyzer\Class\Using;
 
 final class ClassAnalyzer extends NodeVisitorAbstract
 {
@@ -52,9 +53,10 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         if ($node instanceof Use_) {
             foreach ($node->uses as $using) {
                 $alias = $using->alias ?? $using->name->getLast();
+                /** @var class-string $fqcn */
                 $fqcn = $using->name->toCodeString();
                 $this->result->addUsing(
-                    new Class\Using($alias instanceof Identifier ? $alias->name : $alias, $fqcn)
+                    new Using($alias instanceof Identifier ? $alias->name : $alias, $fqcn)
                 );
             }
         }
