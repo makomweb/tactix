@@ -50,8 +50,8 @@ final readonly class AttributeNameFactory
                 yield AttributeName::fromAttributeClass($attribute->getName());
             } catch (\InvalidArgumentException) {
                 /*
-                 * Unsupported classes do not deliver a tactical DDD attribute.
-                 * Hence, ignore this.
+                 * An unsupported attribute does not deliver a tactical DDD attribute.
+                 * Hence, ignore it.
                  */
             }
         }
