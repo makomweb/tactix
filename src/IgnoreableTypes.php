@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tactix;
 
-final readonly class Ignoreable
+final readonly class IgnoreableTypes
 {
     /** @var string[] */
-    public const array TYPES = [
+    public const array VALUES = [
         'string',
         'class-string',
         'self',
