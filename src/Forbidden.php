@@ -7,7 +7,7 @@ namespace Tactix;
 final readonly class Forbidden
 {
     /** @param AttributeName[] $to */
-    private function __construct(public AttributeName $from, public array $to = [])
+    private function __construct(public AttributeName $from, public array $to)
     {
     }
 
@@ -46,7 +46,7 @@ final readonly class Forbidden
             new self(AttributeName::AGGREGATE_ROOT, [AttributeName::FACTORY]),
             new self(AttributeName::REPOSITORY, [AttributeName::FACTORY, AttributeName::SERVICE]),
             new self(AttributeName::FACTORY, [AttributeName::REPOSITORY]),
-            new self(AttributeName::SERVICE /* nothing is forbidden */),
+            new self(AttributeName::SERVICE, [/* nothing is forbidden */]),
         ];
     }
 }
