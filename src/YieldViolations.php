@@ -29,7 +29,7 @@ final readonly class YieldViolations
         /* Yield a violation for every forbidden relation in this folder. */
         foreach (YieldRelations::from($folder) as $relation) {
             if ($relation->isForbidden) {
-                yield new Violation(sprintf('%s is forbidden! 💥', $relation));
+                yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
             }
         }
     }
