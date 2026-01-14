@@ -9,7 +9,7 @@ use Tactix\Attribute\ValueObject;
 #[ValueObject]
 class MyValueObject
 {
-    public function __construct(MyEntity $entity)
+    public function __construct(public readonly MyEntity $entity)
     {
     }
 }
