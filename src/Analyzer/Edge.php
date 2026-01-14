@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tactix\Analyzer;
 
-enum MyEdge: string
+enum Edge: string
 {
     case IMPLEMENTS = 'implements';
     case EXTENDS = 'extends';

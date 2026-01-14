@@ -22,17 +22,18 @@ use Tactix\Analyzer\Class\Method;
 use Tactix\Analyzer\Class\Name as AnalyzerClassName;
 use Tactix\Analyzer\Class\NameType;
 use Tactix\Analyzer\Class\ReturnType;
+use Tactix\Analyzer\Class\Using;
 
 final class ClassAnalyzer extends NodeVisitorAbstract
 {
-    private function __construct(public readonly Result $result)
+    private function __construct(public readonly SourceCodeItem $item)
     {
     }
 
     /** @param class-string $className */
     public static function create(string $className): self
     {
-        return new self(Result::initial($className));
+        return new self(SourceCodeItem::initial($className));
     }
 
     public function enterNode(Node $node): ?Node
@@ -46,22 +47,23 @@ final class ClassAnalyzer extends NodeVisitorAbstract
     {
         if ($node instanceof Namespace_) {
             assert(!is_null($node->name));
-            $this->result->setNamespace($node->name->name);
+            $this->item->setNamespace($node->name->name);
         }
 
         if ($node instanceof Use_) {
             foreach ($node->uses as $using) {
                 $alias = $using->alias ?? $using->name->getLast();
+                /** @var class-string $fqcn */
                 $fqcn = $using->name->toCodeString();
-                $this->result->addUsing(
-                    new Class\Using($alias instanceof Identifier ? $alias->name : $alias, $fqcn)
+                $this->item->addUsing(
+                    new Using($alias instanceof Identifier ? $alias->name : $alias, $fqcn)
                 );
             }
         }
 
         if ($node instanceof Class_) {
             foreach ($node->implements as $interface) {
-                $this->result->addImplements(
+                $this->item->addImplements(
                     new AnalyzerClassName(
                         $interface->name,
                         match (true) {
@@ -78,7 +80,7 @@ final class ClassAnalyzer extends NodeVisitorAbstract
 
             if (!is_null($node->extends)) {
                 $extends = $node->extends;
-                $this->result->addExtends(
+                $this->item->addExtends(
                     new AnalyzerClassName(
                         $extends->name,
                         match (true) {
@@ -101,9 +103,9 @@ final class ClassAnalyzer extends NodeVisitorAbstract
 
     private function add(ClassMethod $method): void
     {
-        $this->result->addMethod(
+        $this->item->addMethod(
             new Method(
-                class: $this->result->fullQualifiedClassName,
+                class: $this->item->fullQualifiedClassName,
                 name: (string) $method->name,
                 arguments: iterator_to_array($this->yieldArguments($method)),
                 returnType: $this->getReturnType($method),

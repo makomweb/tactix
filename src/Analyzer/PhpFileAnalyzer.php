@@ -29,7 +29,7 @@ final class PhpFileAnalyzer
         return new self($filePath, $className);
     }
 
-    public function getResult(): Result
+    public function getSourceCodeItem(): SourceCodeItem
     {
         $parser = (new ParserFactory())->createForNewestSupportedVersion();
         $stmts = $parser->parse($this->getContent());
@@ -40,7 +40,7 @@ final class PhpFileAnalyzer
         assert(!is_null($stmts));
         $traverser->traverse($stmts);
 
-        return $analyzer->result;
+        return $analyzer->item;
     }
 
     private function getContent(): string
