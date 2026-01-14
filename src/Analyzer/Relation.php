@@ -8,16 +8,16 @@ use Tactix\AttributeName;
 use Tactix\AttributeNameFactory;
 use Tactix\Forbidden;
 
-final readonly class MyRelation implements \Stringable
+final readonly class Relation implements \Stringable
 {
     private function __construct(
-        public MyNode $from,
-        public MyEdge $edge,
-        public MyNode $to,
+        public Node $from,
+        public Edge $edge,
+        public Node $to,
     ) {
     }
 
-    public static function create(MyNode $from, MyEdge $edge, MyNode $to): self
+    public static function create(Node $from, Edge $edge, Node $to): self
     {
         return new self($from, $edge, $to);
     }

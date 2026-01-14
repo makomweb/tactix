@@ -10,7 +10,7 @@ use Tactix\Analyzer\Class\Name;
 final readonly class YieldRelations
 {
     /**
-     * @return \Generator<MyRelation>
+     * @return \Generator<Relation>
      */
     public static function from(string $folder): \Generator
     {
@@ -20,12 +20,12 @@ final readonly class YieldRelations
     }
 
     /**
-     * @return \Generator<MyRelation>
+     * @return \Generator<Relation>
      */
     public static function yieldRelations(SourceCodeItem $item): \Generator
     {
-        yield from self::fromTargets($item, $item->implements, MyEdge::IMPLEMENTS);
-        yield from self::fromTargets($item, $item->extends, MyEdge::EXTENDS);
+        yield from self::fromTargets($item, $item->implements, Edge::IMPLEMENTS);
+        yield from self::fromTargets($item, $item->extends, Edge::EXTENDS);
 
         foreach ($item->methods as $method) {
             foreach (self::fromMethod($item, $method) as $relation) {
@@ -37,46 +37,46 @@ final readonly class YieldRelations
     /**
      * @param Name[] $targets
      *
-     * @return \Generator<MyRelation>
+     * @return \Generator<Relation>
      */
-    private static function fromTargets(SourceCodeItem $item, array $targets, MyEdge $edge): \Generator
+    private static function fromTargets(SourceCodeItem $item, array $targets, Edge $edge): \Generator
     {
         foreach ($targets as $target) {
-            yield MyRelation::create(
-                MyNode::fromString($item->fullQualifiedClassName),
+            yield Relation::create(
+                Node::fromString($item->fullQualifiedClassName),
                 $edge,
-                MyNodeFactory::createNode($item, $target)
+                NodeFactory::createNode($item, $target)
             );
         }
     }
 
     /**
-     * @return \Generator<MyRelation>
+     * @return \Generator<Relation>
      */
     private static function fromMethod(SourceCodeItem $item, Method $method): \Generator
     {
         foreach ($method->arguments as $argument) {
-            yield MyRelation::create(
-                MyNode::fromString($item->fullQualifiedClassName),
-                MyEdge::CONSUMES,
-                MyNodeFactory::createNode($item, $argument->type)
+            yield Relation::create(
+                Node::fromString($item->fullQualifiedClassName),
+                Edge::CONSUMES,
+                NodeFactory::createNode($item, $argument->type)
             );
         }
 
         if (!$method->returnType->canBeIgnored()) {
             assert($method->returnType->typeName instanceof Name);
-            yield MyRelation::create(
-                MyNode::fromString($item->fullQualifiedClassName),
-                MyEdge::PRODUCES,
-                MyNodeFactory::createNode($item, $method->returnType->typeName)
+            yield Relation::create(
+                Node::fromString($item->fullQualifiedClassName),
+                Edge::PRODUCES,
+                NodeFactory::createNode($item, $method->returnType->typeName)
             );
         }
 
         foreach ($method->throws as $exception) {
-            yield MyRelation::create(
-                MyNode::fromString($item->fullQualifiedClassName),
-                MyEdge::THROWS,
-                MyNodeFactory::createNode($item, $exception)
+            yield Relation::create(
+                Node::fromString($item->fullQualifiedClassName),
+                Edge::THROWS,
+                NodeFactory::createNode($item, $exception)
             );
         }
     }

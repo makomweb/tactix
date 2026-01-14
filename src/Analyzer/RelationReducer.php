@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tactix\Analyzer;
 
-final readonly class MyRelationReducer
+final readonly class RelationReducer
 {
     /**
-     * @param MyEdge[] $considerEdges
+     * @param Edge[]   $considerEdges
      * @param string[] $ignoreTypes
      * @param string[] $nodeShouldNotStartWith
      * @param string[] $nodeShouldNotContain
@@ -21,11 +21,11 @@ final readonly class MyRelationReducer
     }
 
     /**
-     * @param MyRelation[] $relations
+     * @param Relation[] $relations
      *
-     * @return MyRelation[]
+     * @return Relation[]
      */
-    public function __invoke(array $relations, MyRelation $relation): array
+    public function __invoke(array $relations, Relation $relation): array
     {
         // Should this relation be ignored because of its' "to" type?
         if ($this->shouldIgnore($relation)) {
@@ -47,7 +47,7 @@ final readonly class MyRelationReducer
         return [...$relations, $relation];
     }
 
-    private function shouldIgnore(MyRelation $relation): bool
+    private function shouldIgnore(Relation $relation): bool
     {
         if (in_array($relation->to->fqcn, $this->ignoreTypes, strict: true)) {
             return true;

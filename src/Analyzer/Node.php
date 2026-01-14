@@ -6,7 +6,7 @@ namespace Tactix\Analyzer;
 
 use Tactix\Analyzer\Class\Name;
 
-final readonly class MyNode implements \Stringable
+final readonly class Node implements \Stringable
 {
     /**
      * @param class-string $fqcn

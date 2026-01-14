@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tactix\Analyzer;
 
-final readonly class MyNodeReducer
+final readonly class NodeReducer
 {
     /**
      * @param string[] $ignoreTypes
@@ -19,11 +19,11 @@ final readonly class MyNodeReducer
     }
 
     /**
-     * @param MyNode[] $nodes
+     * @param Node[] $nodes
      *
-     * @return MyNode[]
+     * @return Node[]
      */
-    public function __invoke(array $nodes, MyNode $node): array
+    public function __invoke(array $nodes, Node $node): array
     {
         if ($this->shouldIgnore($node)) {
             return $nodes;
@@ -38,7 +38,7 @@ final readonly class MyNodeReducer
         return [...$nodes, $node];
     }
 
-    private function shouldIgnore(MyNode $node): bool
+    private function shouldIgnore(Node $node): bool
     {
         if (in_array($node->getName(), $this->ignoreTypes, strict: true)) {
             return true;

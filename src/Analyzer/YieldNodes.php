@@ -9,7 +9,7 @@ use Tactix\Analyzer\Class\Name;
 
 final readonly class YieldNodes
 {
-    /** @return \Generator<MyNode> */
+    /** @return \Generator<Node> */
     public static function from(string $folder): \Generator
     {
         foreach (SourceCodeItem::yieldFromFolder($folder) as $item) {
@@ -17,17 +17,17 @@ final readonly class YieldNodes
         }
     }
 
-    /** @return \Generator<MyNode> */
+    /** @return \Generator<Node> */
     private static function yieldNodes(SourceCodeItem $item): \Generator
     {
-        yield MyNode::fromString($item->fullQualifiedClassName);
+        yield Node::fromString($item->fullQualifiedClassName);
 
         foreach ($item->implements as $implements) {
-            yield MyNodeFactory::createNode($item, $implements);
+            yield NodeFactory::createNode($item, $implements);
         }
 
         foreach ($item->extends as $extends) {
-            yield MyNodeFactory::createNode($item, $extends);
+            yield NodeFactory::createNode($item, $extends);
         }
 
         foreach ($item->methods as $method) {
@@ -37,20 +37,20 @@ final readonly class YieldNodes
         }
     }
 
-    /** @return \Generator<MyNode> */
+    /** @return \Generator<Node> */
     private static function fromMethod(SourceCodeItem $item, Method $method): \Generator
     {
         foreach ($method->arguments as $argument) {
-            yield MyNodeFactory::createNode($item, $argument->type);
+            yield NodeFactory::createNode($item, $argument->type);
         }
 
         if (!$method->returnType->canBeIgnored()) {
             assert($method->returnType->typeName instanceof Name);
-            yield MyNodeFactory::createNode($item, $method->returnType->typeName);
+            yield NodeFactory::createNode($item, $method->returnType->typeName);
         }
 
         foreach ($method->throws as $exception) {
-            yield MyNodeFactory::createNode($item, $exception);
+            yield NodeFactory::createNode($item, $exception);
         }
     }
 }
