@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tactix;
 
+use Tactix\Analyzer\Class\YieldClassNames;
 use Tactix\Analyzer\YieldRelations;
 
 final readonly class YieldViolations
@@ -22,11 +23,11 @@ final readonly class YieldViolations
         }
 
         /* Check that all classes have a tactical tag. Yield a violation if not. */
-        foreach (self::yieldClassNamesFromFolder($folder) as $className) {
+        foreach (YieldClassNames::for($folder) as $className) {
             yield from self::fromClassName($className);
         }
 
-        /* Yield a violation for every forbidden relation in this folder. */
+        /* Yield a violation for every forbidden relation within this folder. */
         foreach (YieldRelations::from($folder) as $relation) {
             if ($relation->isForbidden) {
                 yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
@@ -60,43 +61,6 @@ final readonly class YieldViolations
 
         if (is_null($tag)) {
             yield new Violation(sprintf('%s has no tactical tag! ❌', $className));
-        }
-    }
-
-    /**
-     * @param non-empty-string $folder
-     *
-     * @return \Generator<class-string>
-     */
-    private static function yieldClassNamesFromFolder(string $folder): \Generator
-    {
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($folder, \FilesystemIterator::SKIP_DOTS)
-        );
-
-        /** @var \SplFileInfo $file */
-        foreach ($it as $file) {
-            if (!$file->isFile() || 'php' !== $file->getExtension()) {
-                continue;
-            }
-
-            $contents = @file_get_contents($file->getPathname());
-            if (!is_string($contents) || '' === $contents) {
-                continue;
-            }
-
-            $namespace = null;
-            if (1 === preg_match('/^\s*namespace\s+([^;]+);/m', $contents, $m)) {
-                $namespace = trim($m[1]);
-            }
-
-            if (preg_match_all('/^\s*(?:final\s+|abstract\s+)?class\s+([A-Za-z_][A-Za-z0-9_]*)\b/m', $contents, $m) > 0) {
-                foreach ($m[1] as $shortName) {
-                    /** @var class-string $fqcn */
-                    $fqcn = $namespace ? $namespace.'\\'.$shortName : $shortName;
-                    yield $fqcn;
-                }
-            }
         }
     }
 }
