@@ -13,7 +13,9 @@ final readonly class YieldNodes
     public static function from(string $folder): \Generator
     {
         foreach (SourceCodeItem::yieldFromFolder($folder) as $item) {
-            yield from self::yieldNodes($item);
+            foreach (self::yieldNodes($item) as $node) {
+                yield $node;
+            }
         }
     }
 
