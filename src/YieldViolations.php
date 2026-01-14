@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Tactix;
 
+use Tactix\Analyzer\YieldRelations;
+
 final readonly class YieldViolations
 {
     /**
+     * Yield violations for the classes in the specified folder.
+     *
      * @param non-empty-string $folder
      *
      * @return \Generator<Violation>
@@ -17,8 +21,16 @@ final readonly class YieldViolations
             throw new \InvalidArgumentException("{$folder} is not a directory!");
         }
 
+        /* Check that all classes have a tactical tag. Yield a violation if not. */
         foreach (self::yieldClassNamesFromFolder($folder) as $className) {
             yield from self::fromClassName($className);
+        }
+
+        /* Yield a violation for every forbidden relation in this folder. */
+        foreach (YieldRelations::from($folder) as $relation) {
+            if ($relation->isForbidden) {
+                yield new Violation(sprintf('%s is forbidden! 💥', $relation));
+            }
         }
     }
 
@@ -81,7 +93,7 @@ final readonly class YieldViolations
             if (preg_match_all('/^\s*(?:final\s+|abstract\s+)?class\s+([A-Za-z_][A-Za-z0-9_]*)\b/m', $contents, $m) > 0) {
                 foreach ($m[1] as $shortName) {
                     /** @var class-string $fqcn */
-                    $fqcn = $namespace ? $namespace.'\\'.$shortName : $shortName;                    
+                    $fqcn = $namespace ? $namespace.'\\'.$shortName : $shortName;
                     yield $fqcn;
                 }
             }
