@@ -28,7 +28,7 @@ final readonly class YieldViolations
         }
 
         /* Yield a violation for every forbidden relation within this folder. */
-        foreach (YieldRelations::from($folder) as $relation) {
+        foreach (YieldRelations::fromFolder($folder) as $relation) {
             if ($relation->isForbidden()) {
                 yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
             }
@@ -61,6 +61,13 @@ final readonly class YieldViolations
 
         if (is_null($tag)) {
             yield new Violation(sprintf('%s has no tactical tag! ❌', $className));
+        }
+
+        /* Yield a violation for every forbidden relation this class has. */
+        foreach (YieldRelations::fromClassName($className) as $relation) {
+            if ($relation->isForbidden()) {
+                yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
+            }
         }
     }
 }

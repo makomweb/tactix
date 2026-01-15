@@ -68,13 +68,15 @@ final class SourceCodeItem
     {
         Assert::that(is_dir($folder), "$folder is not a directory!");
 
+        $factory = new SourceCodeItemFactory();
+
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder)) as $fileInfo) {
             assert($fileInfo instanceof \SplFileInfo);
             if ('php' === $fileInfo->getExtension()) {
                 $filePath = $fileInfo->getRealPath();
-                assert(is_string($filePath));
+                assert(is_string($filePath) && !empty($filePath));
                 $analyzer = PhpFileAnalyzer::fromFile($filePath);
-                yield $analyzer->getSourceCodeItem();
+                yield $factory->getSourceCodeItem($analyzer->className, $analyzer->filePath);
             }
         }
     }

@@ -12,17 +12,25 @@ final readonly class YieldRelations
     /**
      * @return \Generator<Relation>
      */
-    public static function from(string $folder): \Generator
+    public static function fromFolder(string $folder): \Generator
     {
         foreach (SourceCodeItem::yieldFromFolder($folder) as $item) {
-            yield from self::yieldRelations($item);
+            yield from self::fromSourceCodeItem($item);
         }
     }
 
     /**
      * @return \Generator<Relation>
      */
-    public static function yieldRelations(SourceCodeItem $item): \Generator
+    public static function fromClassName(string $className): \Generator
+    {
+        throw new \Exception('Not yet implemented!');
+    }
+
+    /**
+     * @return \Generator<Relation>
+     */
+    public static function fromSourceCodeItem(SourceCodeItem $item): \Generator
     {
         yield from self::fromTargets($item, $item->implements, Edge::IMPLEMENTS);
         yield from self::fromTargets($item, $item->extends, Edge::EXTENDS);
