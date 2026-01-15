@@ -124,8 +124,13 @@ final class ClassAnalyzer extends NodeVisitorAbstract
     /** @return \Generator<Argument> */
     private function yieldArguments(ClassMethod $method): \Generator
     {
+        $docBlockParamTypes = self::getDocBlockParamTypes($method);
+
         foreach ($method->params as $param) {
-            yield $this->getArgumentType($param);
+            $paramName = $param->var instanceof Variable ? $param->var->name : null;
+            $docType = is_string($paramName) ? $docBlockParamTypes[$paramName] ?? null : null;
+
+            yield $this->getArgumentType($param, $docType);
         }
     }
 
@@ -165,7 +170,7 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         return ReturnType::unknown();
     }
 
-    private function getArgumentType(Param $param): Argument
+    private function getArgumentType(Param $param, ?string $docType): Argument
     {
         assert($param->var instanceof Variable);
         $name = $param->var->name;
@@ -174,17 +179,79 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         assert(!is_null($param->type), "Param \"{$name}\" should not have type null!");
 
         $isNullable = $param->type instanceof NullableType;
-        $isArray = $param->type instanceof Identifier && 'array' === $param->type->name;
+        $isCollection = $param->type instanceof Identifier && in_array($param->type->name, ['array', 'list', 'iterable']);
+        $typeValue = $isCollection ? 'array' : self::getTypeAsString($param->type);
 
-        $type = new AnalyzerClassName(
-            $isArray ? 'array' : $this->getTypeAsString($param->type),
-            NameType::UNKNOWN
-        );
+        if ($isCollection) {
+            $collectionDocType = self::resolveCollectionDocType($docType);
+            if (null !== $collectionDocType) {
+                $typeValue = $collectionDocType;
+            }
+        }
 
-        return new Argument($name, $type, $isNullable, $isArray);
+        $type = new AnalyzerClassName($typeValue, NameType::UNKNOWN);
+
+        return new Argument($name, $type, $isNullable, $isCollection);
     }
 
-    private function getTypeAsString(?Node $node): string
+    /**
+     * @return array<string, string>
+     */
+    private static function getDocBlockParamTypes(ClassMethod $method): array
+    {
+        $docComment = $method->getDocComment();
+        if (null === $docComment) {
+            return [];
+        }
+
+        $doc = $docComment->getText();
+        preg_match_all('/@param\s+([^\s]+)\s+\$([^\s]+)/', $doc, $matches, PREG_SET_ORDER);
+
+        $types = [];
+        foreach ($matches as $match) {
+            $paramName = $match[2];
+            $type = $match[1];
+
+            // if (is_string($paramName) && is_string($type))
+
+            $types[$paramName] = $type;
+        }
+
+        return $types;
+    }
+
+    private static function resolveCollectionDocType(?string $docType): ?string
+    {
+        if (null === $docType) {
+            return null;
+        }
+
+        $docType = trim($docType);
+        if ('' === $docType) {
+            return null;
+        }
+
+        $docType = trim(explode('|', $docType)[0]);
+        if ('' === $docType) {
+            return null;
+        }
+
+        if (str_ends_with($docType, '[]')) {
+            return rtrim(substr($docType, 0, -2));
+        }
+
+        if (preg_match('/^(?:array|list|iterable)<\s*([^,>]+)\s*>$/i', $docType, $matches)) {
+            return trim($matches[1]);
+        }
+
+        if (preg_match('/^(?:array|list|iterable)<\s*[^,>]+,\s*([^>]+)\s*>$/i', $docType, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return null;
+    }
+
+    private static function getTypeAsString(?Node $node): string
     {
         if ($node instanceof NullableType) {
             return (string) $node->type;
@@ -193,10 +260,10 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             return (string) $node;
         }
         if ($node instanceof UnionType) {
-            return implode('|', array_map(fn ($t) => $this->getTypeAsString($t), $node->types));
+            return implode('|', array_map(fn ($t) => self::getTypeAsString($t), $node->types));
         }
         if ($node instanceof IntersectionType) {
-            return implode('&', array_map(fn ($t) => $this->getTypeAsString($t), $node->types));
+            return implode('&', array_map(fn ($t) => self::getTypeAsString($t), $node->types));
         }
 
         return 'unknown';

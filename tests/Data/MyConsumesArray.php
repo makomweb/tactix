@@ -7,12 +7,13 @@ namespace Tactix\Tests\Data;
 use PHPMolecules\DDD\Attribute\ValueObject;
 
 #[ValueObject]
-final readonly class MyCollection
+final readonly class MyConsumesArray
 {
     /**
      * @param MyValueObject[] $collection
      */
-    public function __construct(public array $collection)
+    public function consumes(array $collection): void
     {
+        throw new \Exception('Not yet implemented!');
     }
 }
