@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ed7f51f4719c1a2244fa2549cd10101e",
+    "content-hash": "5b3aa322fef80958260ce3ac652d8aa9",
     "packages": [
         {
             "name": "nikic/php-parser",
@@ -63,6 +63,53 @@
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
             },
             "time": "2025-12-06T11:56:16+00:00"
+        },
+        {
+            "name": "xmolecules/phpmolecules",
+            "version": "v0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xmolecules/phpmolecules.git",
+                "reference": "5431de35ceb5598fe6798db1f69dacf921afad99"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xmolecules/phpmolecules/zipball/5431de35ceb5598fe6798db1f69dacf921afad99",
+                "reference": "5431de35ceb5598fe6798db1f69dacf921afad99",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.7",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPMolecules\\DDD\\": "src/DDD"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Henning Schwentner",
+                    "email": "hs@wps.de",
+                    "homepage": "http://hschwentner.io"
+                }
+            ],
+            "description": "Libraries to help developers express architectural abstractions in PHP code",
+            "homepage": "https://xmolecules.org/",
+            "support": {
+                "issues": "https://github.com/xmolecules/phpmolecules/issues",
+                "source": "https://github.com/xmolecules/phpmolecules/tree/v0.2.0"
+            },
+            "time": "2022-05-31T17:19:46+00:00"
         }
     ],
     "packages-dev": [

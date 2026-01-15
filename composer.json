@@ -22,7 +22,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
-        "nikic/php-parser": "^5.7"
+        "nikic/php-parser": "^5.7",
+        "xmolecules/phpmolecules": "^0.2.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
