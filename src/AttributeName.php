@@ -21,7 +21,7 @@ enum AttributeName: string
     case REPOSITORY = 'Repository';
 
     /**
-     * Get the full qualified class name.
+     * Get the full qualified class name of the attribute class.
      */
     public function getFQCN(): string
     {
