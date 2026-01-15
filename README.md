@@ -22,7 +22,13 @@ Requirements:
 
 ### 1. Tag your classes
 
-- install tags via `composer require xmolecules/phpmolecules`
+- install the tags package from PHP Molecules as a regular dependeny via:
+
+```bash
+composer require xmolecules/phpmolecules
+```
+
+- tag your classes with the available attributes:
 
 ```php
 use PHPMolecules\DDD\Attribute\AggregateRoot;
