@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tactix;
 
-use Tactix\Attribute\AggregateRoot;
-use Tactix\Attribute\Entity;
-use Tactix\Attribute\Factory;
-use Tactix\Attribute\Repository;
-use Tactix\Attribute\Service;
-use Tactix\Attribute\ValueObject;
+use PHPMolecules\DDD\Attribute\AggregateRoot;
+use PHPMolecules\DDD\Attribute\Entity;
+use PHPMolecules\DDD\Attribute\Factory;
+use PHPMolecules\DDD\Attribute\Repository;
+use PHPMolecules\DDD\Attribute\Service;
+use PHPMolecules\DDD\Attribute\ValueObject;
 
 enum AttributeName: string
 {
