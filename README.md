@@ -22,13 +22,15 @@ Requirements:
 
 ### 1. Tag your classes
 
+- install tags via `composer require xmolecules/phpmolecules`
+
 ```php
-use Tactix\Attribute\AggregateRoot;
-use Tactix\Attribute\Entity;
-use Tactix\Attribute\ValueObject;
-use Tactix\Attribute\Service;
-use Tactix\Attribute\Factory;
-use Tactix\Attribute\Repository;
+use PHPMolecules\DDD\Attribute\AggregateRoot;
+use PHPMolecules\DDD\Attribute\Entity;
+use PHPMolecules\DDD\Attribute\ValueObject;
+use PHPMolecules\DDD\Attribute\Service;
+use PHPMolecules\DDD\Attribute\Factory;
+use PHPMolecules\DDD\Attribute\Repository;
 
 #[Entity]
 final class User {}
