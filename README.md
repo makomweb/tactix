@@ -11,11 +11,12 @@ Tactical DDD, simplified for PHP: tag your classes (via PHP attributes) and vali
 ## Installation
 
 ```bash
-composer require makomweb/tactix
+composer require --dev makomweb/tactix
 ```
 
 Requirements:
 - PHP ^8.2
+- your source code being tagged with [PHP Molecules](https://github.com/xmolecules/phpmolecules)
 
 ## Usage
 
