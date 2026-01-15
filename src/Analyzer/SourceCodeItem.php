@@ -7,7 +7,6 @@ namespace Tactix\Analyzer;
 use Tactix\Analyzer\Class\Method;
 use Tactix\Analyzer\Class\Name;
 use Tactix\Analyzer\Class\Using;
-use Tactix\Assert\Assert;
 
 final class SourceCodeItem
 {
@@ -59,25 +58,5 @@ final class SourceCodeItem
     public function addMethod(Method $method): void
     {
         $this->methods[] = $method;
-    }
-
-    /**
-     * @return \Generator<SourceCodeItem>
-     */
-    public static function yieldFromFolder(string $folder): \Generator
-    {
-        Assert::that(is_dir($folder), "$folder is not a directory!");
-
-        $factory = new SourceCodeItemFactory();
-
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder)) as $fileInfo) {
-            assert($fileInfo instanceof \SplFileInfo);
-            if ('php' === $fileInfo->getExtension()) {
-                $filePath = $fileInfo->getRealPath();
-                assert(is_string($filePath) && !empty($filePath));
-                $analyzer = PhpFileAnalyzer::fromFile($filePath);
-                yield $factory->getSourceCodeItem($analyzer->className, $analyzer->filePath);
-            }
-        }
     }
 }

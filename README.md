@@ -33,15 +33,12 @@ use Tactix\Attribute\Repository;
 final class User {}
 ```
 
-### 2. Check a class or an entire folder
+### 2. Check your classes or folders
 
 ```php
 use Tactix\Check;
 
-// Check a single class if it does carry a tactical tag
 Check::className(User::class);
-
-// Check an entire folder for missing tags + forbidden relations
 Check::folder(__DIR__.'/src');
 ```
 
@@ -49,7 +46,7 @@ Check::folder(__DIR__.'/src');
 - `Tactix\ClassViolationException`
 - `Tactix\FolderViolationException`
 
-Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details.
+Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about wether there are missing tags, ambiguity or forbidden relations.
 
 ## Forbidden relations
 

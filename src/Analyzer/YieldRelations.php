@@ -14,17 +14,20 @@ final readonly class YieldRelations
      */
     public static function fromFolder(string $folder): \Generator
     {
-        foreach (SourceCodeItem::yieldFromFolder($folder) as $item) {
+        foreach (SourceCodeItemFactory::yieldFromFolder($folder) as $item) {
             yield from self::fromSourceCodeItem($item);
         }
     }
 
     /**
+     * @param class-string $className
+     *
      * @return \Generator<Relation>
      */
     public static function fromClassName(string $className): \Generator
     {
-        throw new \Exception('Not yet implemented!');
+        $item = SourceCodeItemFactory::fromClassName($className);
+        yield from self::fromSourceCodeItem($item);
     }
 
     /**
