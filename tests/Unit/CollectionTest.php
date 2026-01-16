@@ -14,8 +14,10 @@ use Tactix\Tests\Data\MyConsumesArray;
 use Tactix\Tests\Data\MyConsumesArrayTemplate;
 use Tactix\Tests\Data\MyConsumesIterable;
 use Tactix\Tests\Data\MyConsumesList;
+use Tactix\Tests\Data\MyEntity;
 use Tactix\Tests\Data\MyProducesArray;
 use Tactix\Tests\Data\MyProducesArrayTemplate;
+use Tactix\Tests\Data\MyProducesGenerator;
 use Tactix\Tests\Data\MyProducesIterable;
 use Tactix\Tests\Data\MyProducesList;
 use Tactix\Tests\Data\MyValueObject;
@@ -23,63 +25,65 @@ use Tactix\Tests\Data\MyValueObject;
 class CollectionTest extends TestCase
 {
     /**
-     * @param class-string $fromClassName
+     * @param class-string   $fromClassName
+     * @param class-string[] $toClassNames
      */
     #[Test]
     #[DataProvider('provideConsumingClasses')]
-    public function consumes_collection(string $fromClassName): void
+    public function consumes_collection(string $fromClassName, Edge $expectedEdge, array $toClassNames): void
     {
         $relations = iterator_to_array(YieldRelations::fromClassName($fromClassName));
 
-        /** @var Relation $relation */
-        $relation = $relations[0];
-
-        self::assertInstanceOf(Relation::class, $relation);
-        self::assertSame($fromClassName, $relation->from->fqcn);
-        self::assertEquals($relation->edge, Edge::CONSUMES);
-        self::assertSame(MyValueObject::class, $relation->to->fqcn);
+        foreach ($relations as $relation) {
+            self::assertInstanceOf(Relation::class, $relation);
+            self::assertSame($fromClassName, $relation->from->fqcn);
+            self::assertEquals($expectedEdge, $relation->edge);
+            self::assertTrue(in_array($relation->to->fqcn, $toClassNames, strict: true));
+        }
     }
+
     /**
-     * @param class-string $fromClassName
+     * @param class-string   $fromClassName
+     * @param class-string[] $toClassNames
      */
     #[Test]
     #[DataProvider('provideProducingClasses')]
-    public function produces_collection(string $fromClassName): void
+    public function produces_collection(string $fromClassName, Edge $expectedEdge, array $toClassNames): void
     {
         $relations = iterator_to_array(YieldRelations::fromClassName($fromClassName));
 
-        /** @var Relation $relation */
-        $relation = $relations[0];
-
-        self::assertInstanceOf(Relation::class, $relation);
-        self::assertSame($fromClassName, $relation->from->fqcn);
-        self::assertEquals($relation->edge, Edge::PRODUCES);
-        self::assertSame(MyValueObject::class, $relation->to->fqcn);
+        foreach ($relations as $relation) {
+            self::assertInstanceOf(Relation::class, $relation);
+            self::assertSame($fromClassName, $relation->from->fqcn);
+            self::assertSame($expectedEdge, $relation->edge);
+            self::assertTrue(in_array($relation->to->fqcn, $toClassNames, strict: true));
+        }
     }
 
     /**
-     * @return array<int, string[]>
+     * @return array<int, array{class-string, Edge, class-string[]}>
      */
     public static function provideConsumingClasses(): array
     {
         return [
-            [MyConsumesArray::class],
-            [MyConsumesArrayTemplate::class],
-            [MyConsumesList::class],
-            [MyConsumesIterable::class],
+            [MyConsumesArray::class, Edge::CONSUMES, [MyValueObject::class]],
+            [MyConsumesArrayTemplate::class, Edge::CONSUMES, [MyValueObject::class]],
+            [MyConsumesList::class, Edge::CONSUMES, [MyValueObject::class]],
+            [MyConsumesIterable::class, Edge::CONSUMES, [MyValueObject::class]],
         ];
     }
 
     /**
-     * @return array<int, string[]>
+     * @return array<int, array{class-string, Edge, class-string[]}>
      */
     public static function provideProducingClasses(): array
     {
         return [
-            [MyProducesArray::class],
-            [MyProducesArrayTemplate::class],
-            [MyProducesList::class],
-            [MyProducesIterable::class],
+            [MyProducesArray::class, Edge::PRODUCES, [MyValueObject::class]],
+            [MyProducesArrayTemplate::class, Edge::PRODUCES, [MyValueObject::class]],
+            [MyProducesList::class, Edge::PRODUCES, [MyValueObject::class]],
+            [MyProducesIterable::class, Edge::PRODUCES, [MyValueObject::class]],
+            // [MyProducesGenerator::class, Edge::PRODUCES, [MyValueObject::class, MyEntity::class]],
         ];
     }
 }
