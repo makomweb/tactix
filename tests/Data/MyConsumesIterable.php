@@ -12,7 +12,7 @@ final readonly class MyConsumesIterable
     /**
      * @param iterable<MyValueObject> $collection
      */
-    public function consumes(iterable $collection): void
+    public function consume(iterable $collection): void
     {
         throw new \Exception('Not yet implemented!');
     }

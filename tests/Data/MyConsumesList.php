@@ -12,7 +12,7 @@ final readonly class MyConsumesList
     /**
      * @param list<MyValueObject> $collection
      */
-    public function consumes(array $collection): void
+    public function consume(array $collection): void
     {
         throw new \Exception('Not yet implemented!');
     }

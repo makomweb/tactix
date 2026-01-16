@@ -136,31 +136,69 @@ final class ClassAnalyzer extends NodeVisitorAbstract
 
     private function getReturnType(ClassMethod $method): ReturnType
     {
+        $docReturnType = self::getDocBlockReturnType($method);
+        $collectionDocType = self::resolveCollectionDocType($docReturnType);
+
         if (is_null($method->returnType)) {
+            if (null !== $collectionDocType) {
+                return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+            }
+
+            if (is_string($docReturnType) && !self::isCollectionDoc($docReturnType)) {
+                return ReturnType::regular(new AnalyzerClassName($docReturnType, NameType::UNKNOWN));
+            }
+
             return ReturnType::void();
         }
 
         $returnType = $method->returnType;
 
         if ($returnType instanceof Identifier || $returnType instanceof Name) {
-            $t = (string) $returnType;
-            if ('void' === $t) {
+            $typeName = (string) $returnType;
+
+            if ('void' === $typeName) {
                 return ReturnType::void();
             }
-            if ('array' === $t || 'Generator' === $t || '\\Generator' === $t) {
+
+            if (self::isCollectionTypeName($typeName)) {
+                if (null !== $collectionDocType) {
+                    return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                }
+
                 return ReturnType::unknown();
             }
 
-            return ReturnType::regular(new AnalyzerClassName($t, NameType::UNKNOWN));
+            if (self::isGeneratorTypeName($typeName)) {
+                if (null !== $collectionDocType) {
+                    return ReturnType::generator(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                }
+
+                return ReturnType::unknown();
+            }
+
+            return ReturnType::regular(new AnalyzerClassName($typeName, NameType::UNKNOWN));
         }
 
         if ($returnType instanceof NullableType) {
-            $t = (string) $returnType->type;
-            if ('array' === $t || 'Generator' === $t || '\\Generator' === $t) {
+            $typeName = (string) $returnType->type;
+
+            if (self::isCollectionTypeName($typeName)) {
+                if (null !== $collectionDocType) {
+                    return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                }
+
                 return ReturnType::unknown();
             }
 
-            return ReturnType::nullable(new AnalyzerClassName($t, NameType::UNKNOWN));
+            if (self::isGeneratorTypeName($typeName)) {
+                if (null !== $collectionDocType) {
+                    return ReturnType::generator(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                }
+
+                return ReturnType::unknown();
+            }
+
+            return ReturnType::nullable(new AnalyzerClassName($typeName, NameType::UNKNOWN));
         }
 
         if ($returnType instanceof UnionType || $returnType instanceof IntersectionType) {
@@ -211,9 +249,6 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         foreach ($matches as $match) {
             $paramName = $match[2];
             $type = $match[1];
-
-            // if (is_string($paramName) && is_string($type))
-
             $types[$paramName] = $type;
         }
 
@@ -249,6 +284,35 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         }
 
         return null;
+    }
+
+    private static function isCollectionDoc(string $docType): bool
+    {
+        return null !== self::resolveCollectionDocType($docType);
+    }
+
+    private static function isCollectionTypeName(string $type): bool
+    {
+        return in_array(ltrim($type, '\\'), ['array', 'list', 'iterable'], true);
+    }
+
+    private static function isGeneratorTypeName(string $type): bool
+    {
+        return in_array(ltrim($type, '\\'), ['Generator'], true);
+    }
+
+    private static function getDocBlockReturnType(ClassMethod $method): ?string
+    {
+        $docComment = $method->getDocComment();
+        if (null === $docComment) {
+            return null;
+        }
+
+        if (!preg_match('/@return\s+([^\s]+)/', $docComment->getText(), $matches)) {
+            return null;
+        }
+
+        return trim($matches[1]);
     }
 
     private static function getTypeAsString(?Node $node): string
