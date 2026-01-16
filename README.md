@@ -22,7 +22,7 @@ Requirements:
 
 ### 1. Tag your classes
 
-- install the tags package from PHP Molecules as a regular dependeny via:
+- install the tags package from PHP Molecules as a regular dependency via:
 
 ```bash
 composer require xmolecules/phpmolecules
