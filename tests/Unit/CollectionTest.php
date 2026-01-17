@@ -34,6 +34,8 @@ class CollectionTest extends TestCase
     {
         $relations = iterator_to_array(YieldRelations::fromClassName($fromClassName));
 
+        self::assertSameSize($toClassNames, $relations);
+
         foreach ($relations as $relation) {
             self::assertInstanceOf(Relation::class, $relation);
             self::assertSame($fromClassName, $relation->from->fqcn);
@@ -51,6 +53,8 @@ class CollectionTest extends TestCase
     public function produces_collection(string $fromClassName, Edge $expectedEdge, array $toClassNames): void
     {
         $relations = iterator_to_array(YieldRelations::fromClassName($fromClassName));
+
+        self::assertSameSize($toClassNames, $relations);
 
         foreach ($relations as $relation) {
             self::assertInstanceOf(Relation::class, $relation);
@@ -83,7 +87,7 @@ class CollectionTest extends TestCase
             [MyProducesArrayTemplate::class, Edge::PRODUCES, [MyValueObject::class]],
             [MyProducesList::class, Edge::PRODUCES, [MyValueObject::class]],
             [MyProducesIterable::class, Edge::PRODUCES, [MyValueObject::class]],
-            // [MyProducesGenerator::class, Edge::PRODUCES, [MyValueObject::class, MyEntity::class]],
+            [MyProducesGenerator::class, Edge::PRODUCES, [MyValueObject::class, MyEntity::class]],
         ];
     }
 }

@@ -138,10 +138,15 @@ final class ClassAnalyzer extends NodeVisitorAbstract
     {
         $docReturnType = self::getDocBlockReturnType($method);
         $collectionDocType = self::resolveCollectionDocType($docReturnType);
+        $generatorDocType = self::resolveGeneratorDocType($docReturnType);
 
         if (is_null($method->returnType)) {
             if (null !== $collectionDocType) {
                 return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+            }
+
+            if (null !== $generatorDocType) {
+                return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
             }
 
             if (is_string($docReturnType) && !self::isCollectionDoc($docReturnType)) {
@@ -169,8 +174,8 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             }
 
             if (self::isGeneratorTypeName($typeName)) {
-                if (null !== $collectionDocType) {
-                    return ReturnType::generator(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                if (null !== $generatorDocType) {
+                    return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
                 }
 
                 return ReturnType::unknown();
@@ -191,8 +196,8 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             }
 
             if (self::isGeneratorTypeName($typeName)) {
-                if (null !== $collectionDocType) {
-                    return ReturnType::generator(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+                if (null !== $generatorDocType) {
+                    return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
                 }
 
                 return ReturnType::unknown();
@@ -284,6 +289,73 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         }
 
         return null;
+    }
+
+    private static function resolveGeneratorDocType(?string $docType): ?string
+    {
+        if (null === $docType) {
+            return null;
+        }
+
+        $docType = trim($docType);
+        if ('' === $docType) {
+            return null;
+        }
+
+        $docType = trim(explode('|', $docType)[0]);
+        if ('' === $docType) {
+            return null;
+        }
+
+        if (!preg_match('/^(?:\\\\)?Generator<(.+)>$/i', $docType, $matches)) {
+            return null;
+        }
+
+        $parameters = self::splitGenericParameters($matches[1]);
+        if (empty($parameters)) {
+            return null;
+        }
+
+        return trim($parameters[1] ?? $parameters[0]);
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function splitGenericParameters(string $typeList): array
+    {
+        $parts = [];
+        $current = '';
+        $depth = 0;
+        $length = strlen($typeList);
+
+        for ($i = 0; $i < $length; ++$i) {
+            $char = $typeList[$i];
+
+            if (',' === $char && 0 === $depth) {
+                $trimmed = trim($current);
+                if ('' !== $trimmed) {
+                    $parts[] = $trimmed;
+                }
+                $current = '';
+                continue;
+            }
+
+            if ('<' === $char) {
+                ++$depth;
+            } elseif ('>' === $char && $depth > 0) {
+                --$depth;
+            }
+
+            $current .= $char;
+        }
+
+        $trimmed = trim($current);
+        if ('' !== $trimmed) {
+            $parts[] = $trimmed;
+        }
+
+        return $parts;
     }
 
     private static function isCollectionDoc(string $docType): bool
