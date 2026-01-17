@@ -339,19 +339,17 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             return ReturnType::void();
         }
 
-        if (self::isCollectionTypeName($typeName)) {
+        $specialType = self::isSpecialTypeName($typeName);
+        if ($specialType === 'collection') {
             if (null !== $collectionDocType) {
                 return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
             }
-
             return ReturnType::unknown();
         }
-
-        if (self::isGeneratorTypeName($typeName)) {
+        if ($specialType === 'generator') {
             if (null !== $generatorDocType) {
                 return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
             }
-
             return ReturnType::unknown();
         }
 
@@ -360,14 +358,16 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             : ReturnType::regular(new AnalyzerClassName($typeName, NameType::UNKNOWN));
     }
 
-    private static function isCollectionTypeName(string $type): bool
+    private static function isSpecialTypeName(string $type): ?string
     {
-        return in_array(ltrim($type, '\\'), ['array', 'list', 'iterable'], true);
-    }
-
-    private static function isGeneratorTypeName(string $type): bool
-    {
-        return in_array(ltrim($type, '\\'), ['Generator'], true);
+        $type = ltrim($type, '\\');
+        if (in_array($type, ['array', 'list', 'iterable'], true)) {
+            return 'collection';
+        }
+        if ($type === 'Generator') {
+            return 'generator';
+        }
+        return null;
     }
 
     private static function getDocBlockReturnType(ClassMethod $method): ?string
