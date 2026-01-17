@@ -159,51 +159,21 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         $returnType = $method->returnType;
 
         if ($returnType instanceof Identifier || $returnType instanceof Name) {
-            $typeName = (string) $returnType;
-
-            if ('void' === $typeName) {
-                return ReturnType::void();
-            }
-
-            if (self::isCollectionTypeName($typeName)) {
-                if (null !== $collectionDocType) {
-                    return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
-                }
-
-                return ReturnType::unknown();
-            }
-
-            if (self::isGeneratorTypeName($typeName)) {
-                if (null !== $generatorDocType) {
-                    return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
-                }
-
-                return ReturnType::unknown();
-            }
-
-            return ReturnType::regular(new AnalyzerClassName($typeName, NameType::UNKNOWN));
+            return self::createReturnTypeFromString(
+                (string) $returnType,
+                false,
+                $collectionDocType,
+                $generatorDocType
+            );
         }
 
         if ($returnType instanceof NullableType) {
-            $typeName = (string) $returnType->type;
-
-            if (self::isCollectionTypeName($typeName)) {
-                if (null !== $collectionDocType) {
-                    return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
-                }
-
-                return ReturnType::unknown();
-            }
-
-            if (self::isGeneratorTypeName($typeName)) {
-                if (null !== $generatorDocType) {
-                    return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
-                }
-
-                return ReturnType::unknown();
-            }
-
-            return ReturnType::nullable(new AnalyzerClassName($typeName, NameType::UNKNOWN));
+            return self::createReturnTypeFromString(
+                (string) $returnType->type,
+                true,
+                $collectionDocType,
+                $generatorDocType
+            );
         }
 
         if ($returnType instanceof UnionType || $returnType instanceof IntersectionType) {
@@ -361,6 +331,33 @@ final class ClassAnalyzer extends NodeVisitorAbstract
     private static function isCollectionDoc(string $docType): bool
     {
         return null !== self::resolveCollectionDocType($docType);
+    }
+
+    private static function createReturnTypeFromString(string $typeName, bool $nullable, ?string $collectionDocType, ?string $generatorDocType): ReturnType
+    {
+        if ('void' === $typeName) {
+            return ReturnType::void();
+        }
+
+        if (self::isCollectionTypeName($typeName)) {
+            if (null !== $collectionDocType) {
+                return ReturnType::collection(new AnalyzerClassName($collectionDocType, NameType::UNKNOWN));
+            }
+
+            return ReturnType::unknown();
+        }
+
+        if (self::isGeneratorTypeName($typeName)) {
+            if (null !== $generatorDocType) {
+                return ReturnType::generator(new AnalyzerClassName($generatorDocType, NameType::UNKNOWN));
+            }
+
+            return ReturnType::unknown();
+        }
+
+        return $nullable
+            ? ReturnType::nullable(new AnalyzerClassName($typeName, NameType::UNKNOWN))
+            : ReturnType::regular(new AnalyzerClassName($typeName, NameType::UNKNOWN));
     }
 
     private static function isCollectionTypeName(string $type): bool
