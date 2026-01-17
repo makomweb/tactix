@@ -250,11 +250,11 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             return rtrim(substr($docType, 0, -2));
         }
 
-        if (preg_match('/^(?:array|list|iterable)<\s*([^,>]+)\s*>$/i', $docType, $matches)) {
+        if (preg_match('/^(?:\\\\?array|\\\\?list|\\\\?iterable)<\s*([^,>]+)\s*>$/i', $docType, $matches)) {
             return trim($matches[1]);
         }
 
-        if (preg_match('/^(?:array|list|iterable)<\s*[^,>]+,\s*([^>]+)\s*>$/i', $docType, $matches)) {
+        if (preg_match('/^(?:\\\\?array|\\\\?list|\\\\?iterable)<\s*[^,>]+,\s*([^>]+)\s*>$/i', $docType, $matches)) {
             return trim($matches[1]);
         }
 
