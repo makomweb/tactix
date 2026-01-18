@@ -41,7 +41,7 @@ final readonly class ReturnTypeFactory
             );
         }
 
-        throw new \LogicException(sprintf('"%s" (e.g. type union or type intersection) is not yet supported', get_debug_type($returnType)));
+        throw new \LogicException(sprintf('"%s" (unions and intersections) are not supported', get_debug_type($returnType)));
     }
 
     private static function getDocBlockReturnType(ClassMethod $method): ?string
