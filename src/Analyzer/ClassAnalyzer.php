@@ -158,19 +158,6 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         return new Argument($name, $type, $isNullable, $isCollection);
     }
 
-    // private static function isSpecialTypeName(string $type): ?string
-    // {
-    //     $type = ltrim($type, '\\');
-    //     if (in_array($type, ['array', 'list', 'iterable'], true)) {
-    //         return 'collection';
-    //     }
-    //     if ('Generator' === $type) {
-    //         return 'generator';
-    //     }
-
-    //     return null;
-    // }
-
     private static function getTypeAsString(?Node $node): string
     {
         if ($node instanceof NullableType) {
