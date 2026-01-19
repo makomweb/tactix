@@ -1,4 +1,4 @@
-// Mapping von Liste-Keys zu lesbaren Kategorienamen
+// Mapping keys to human readible names
 const categoryMapping = {
     'aggregate_roots': 'Aggregate Root',
     'entities': 'Entity',
@@ -15,19 +15,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const { classes, forbidden, folder } = reportData;
 
-    // Überschrift setzen (folder)
-    document.getElementById("reportFolder").textContent = `Report für ${folder}`;
+    // Headline
+    document.getElementById("reportFolder").textContent = `Report for ${folder}`;
 
     const colors = [
         "#3498db", "#e74c3c", "#1abc9c", "#95a5a6", "#2ecc71", "#f39c12", "#f1c40f", "#9b59b6", "#7f8c8d"
     ];
 
-    // Extrahiere alle Keys für die Charts
+    // Extract keys for the charts
     const labels = Object.keys(classes).filter(key => Array.isArray(classes[key]));
     const values = labels.map(key => classes[key].length);
     const readableLabels = labels.map(key => categoryMapping[key] || key);
 
-    // PIE CHART mit ECharts
+    // PIE CHART
     const pieChart = echarts.init(document.getElementById("pieChart"));
     const pieData = readableLabels.map((label, index) => ({
         name: label,
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
             left: 'left'
         },
         series: [{
-            name: 'Klassen',
+            name: 'Classes',
             type: 'pie',
             radius: '50%',
             data: pieData,
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     pieChart.setOption(pieOption);
 
-    // BAR CHART mit ECharts
+    // BAR CHART
     const barChart = echarts.init(document.getElementById("barChart"));
     
     const barOption = {
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
             minInterval: 1
         },
         series: [{
-            name: 'Anzahl',
+            name: 'Amount',
             type: 'bar',
             data: values,
             itemStyle: {
@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
         barChart.resize();
     });
 
-    // Erstelle die Tabelle mit allen Klassen
     createClassesTable();
 });
 
@@ -114,10 +113,8 @@ function createClassesTable() {
     const container = document.getElementById("classesTableContainer");
     if (!container) return;
 
-    // Sammle alle Klassen mit ihren Kategorien
     const allClasses = [];
 
-    // Durchlaufe alle Kategorien
     Object.keys(reportData.classes).forEach(category => {
         if (Array.isArray(reportData.classes[category])) {
             const readableName = categoryMapping[category] || category;
@@ -130,7 +127,6 @@ function createClassesTable() {
         }
     });
 
-    // Füge forbidden hinzu, falls vorhanden
     if (reportData.forbidden && reportData.forbidden.length > 0) {
         reportData.forbidden.forEach(forbiddenItem => {
             allClasses.push({
@@ -140,21 +136,18 @@ function createClassesTable() {
         });
     }
 
-    // Sortiere alphabetisch nach Klassennamen
     allClasses.sort((a, b) => a.name.localeCompare(b.name));
 
-    // Erstelle die Tabelle
     const table = document.createElement("table");
     table.style.width = "100%";
     table.style.borderCollapse = "collapse";
     table.style.marginTop = "20px";
 
-    // Tabellenkopf
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     
     const thName = document.createElement("th");
-    thName.textContent = "Klassenname";
+    thName.textContent = "Classname";
     thName.style.border = "1px solid #ddd";
     thName.style.padding = "10px";
     thName.style.backgroundColor = "#f5f5f5";
@@ -163,7 +156,7 @@ function createClassesTable() {
     thName.addEventListener("click", () => sortTable(table, 0));
     
     const thCategory = document.createElement("th");
-    thCategory.textContent = "Kategorie";
+    thCategory.textContent = "Category";
     thCategory.style.border = "1px solid #ddd";
     thCategory.style.padding = "10px";
     thCategory.style.backgroundColor = "#f5f5f5";
@@ -176,12 +169,12 @@ function createClassesTable() {
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    // Tabelleninhalt
+    // Table content
     const tbody = document.createElement("tbody");
     allClasses.forEach((classItem, index) => {
         const row = document.createElement("tr");
         
-        // Zebrastreifen
+        // Zebra stripes
         if (index % 2 === 0) {
             row.style.backgroundColor = "#f9f9f9";
         }
@@ -196,7 +189,7 @@ function createClassesTable() {
         tdCategory.style.border = "1px solid #ddd";
         tdCategory.style.padding = "8px";
         
-        // Kategorie-spezifische Farben
+        // Specific colors
         const categoryColors = {
             'Aggregate Root': '#3498db',
             'Entity': '#e74c3c',
@@ -223,7 +216,7 @@ function createClassesTable() {
     table.appendChild(tbody);
     container.appendChild(table);
 
-    // Zeige Gesamtanzahl
+    // Summary count
     const summary = document.createElement("p");
     summary.textContent = `Gesamt: ${allClasses.length} Klassen`;
     summary.style.textAlign = "center";
@@ -242,7 +235,7 @@ function sortTable(table, columnIndex) {
         return aText.localeCompare(bText);
     });
 
-    // Tabelle neu anordnen und Zebrastreifen aktualisieren
+    // Refresh
     sortedRows.forEach((row, index) => {
         if (index % 2 === 0) {
             row.style.backgroundColor = "#f9f9f9";
