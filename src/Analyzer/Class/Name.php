@@ -7,7 +7,7 @@ namespace Tactix\Analyzer\Class;
 final readonly class Name implements \Stringable
 {
     /** @var string[] */
-    public const array STANDARD_NAMES = [
+    public const STANDARD_NAMES = [
         'null',
         'bool',
         'int',

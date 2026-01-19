@@ -7,7 +7,7 @@ namespace Tactix;
 final readonly class IgnoreableTypes
 {
     /** @var string[] */
-    public const array VALUES = [
+    public const VALUES = [
         'string',
         'class-string',
         'self',

@@ -11,10 +11,14 @@ up:
 down:
 	@docker compose down
 
-# Run PHPUnit inside the container (starts a one-off container if not running)
+# Run all QA scripts in the container
+qa:
+	@docker compose exec tactix composer qa
+	
+# Run PHPUnit inside the container
 test:
-	@docker compose run --rm php vendor/bin/phpunit --configuration phpunit.xml.dist $(TESTARGS)
+	@docker compose exec tactix vendor/bin/phpunit --configuration phpunit.xml.dist $(TESTARGS)
 
 # Open an interactive shell in the running container
 shell:
-	@docker exec -it $(CONTAINER_NAME) sh
+	@docker compose exec -it $(CONTAINER_NAME) sh
