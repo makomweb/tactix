@@ -21,7 +21,7 @@ use Tactix\Analyzer\Class\Argument;
 use Tactix\Analyzer\Class\Method;
 use Tactix\Analyzer\Class\Name as AnalyzerClassName;
 use Tactix\Analyzer\Class\NameType;
-use Tactix\Analyzer\Class\ReturnType;
+use Tactix\Analyzer\Class\ReturnTypeFactory;
 use Tactix\Analyzer\Class\Using;
 
 final class ClassAnalyzer extends NodeVisitorAbstract
@@ -108,7 +108,7 @@ final class ClassAnalyzer extends NodeVisitorAbstract
                 class: $this->item->fullQualifiedClassName,
                 name: (string) $method->name,
                 arguments: iterator_to_array($this->yieldArguments($method)),
-                returnType: $this->getReturnType($method),
+                returnType: ReturnTypeFactory::fromMethod($method),
                 static: $method->isStatic(),
                 throws: $this->getExceptionNames($method)
             )
@@ -124,48 +124,17 @@ final class ClassAnalyzer extends NodeVisitorAbstract
     /** @return \Generator<Argument> */
     private function yieldArguments(ClassMethod $method): \Generator
     {
+        $docBlockParamTypes = DocTypeExtractor::getDocBlockParamTypes($method);
+
         foreach ($method->params as $param) {
-            yield $this->getArgumentType($param);
+            $paramName = $param->var instanceof Variable ? $param->var->name : null;
+            $docType = is_string($paramName) ? $docBlockParamTypes[$paramName] ?? null : null;
+
+            yield $this->getArgumentType($param, $docType);
         }
     }
 
-    private function getReturnType(ClassMethod $method): ReturnType
-    {
-        if (is_null($method->returnType)) {
-            return ReturnType::void();
-        }
-
-        $returnType = $method->returnType;
-
-        if ($returnType instanceof Identifier || $returnType instanceof Name) {
-            $t = (string) $returnType;
-            if ('void' === $t) {
-                return ReturnType::void();
-            }
-            if ('array' === $t || 'Generator' === $t || '\\Generator' === $t) {
-                return ReturnType::unknown();
-            }
-
-            return ReturnType::regular(new AnalyzerClassName($t, NameType::UNKNOWN));
-        }
-
-        if ($returnType instanceof NullableType) {
-            $t = (string) $returnType->type;
-            if ('array' === $t || 'Generator' === $t || '\\Generator' === $t) {
-                return ReturnType::unknown();
-            }
-
-            return ReturnType::nullable(new AnalyzerClassName($t, NameType::UNKNOWN));
-        }
-
-        if ($returnType instanceof UnionType || $returnType instanceof IntersectionType) {
-            return ReturnType::unknown();
-        }
-
-        return ReturnType::unknown();
-    }
-
-    private function getArgumentType(Param $param): Argument
+    private function getArgumentType(Param $param, ?string $docType): Argument
     {
         assert($param->var instanceof Variable);
         $name = $param->var->name;
@@ -174,17 +143,22 @@ final class ClassAnalyzer extends NodeVisitorAbstract
         assert(!is_null($param->type), "Param \"{$name}\" should not have type null!");
 
         $isNullable = $param->type instanceof NullableType;
-        $isArray = $param->type instanceof Identifier && 'array' === $param->type->name;
+        $isCollection = $param->type instanceof Identifier && in_array($param->type->name, ['array', 'list', 'iterable']);
+        $typeValue = $isCollection ? 'array' : self::getTypeAsString($param->type);
 
-        $type = new AnalyzerClassName(
-            $isArray ? 'array' : $this->getTypeAsString($param->type),
-            NameType::UNKNOWN
-        );
+        if ($isCollection) {
+            $collectionDocType = DocTypeExtractor::resolveCollectionDocType($docType);
+            if (null !== $collectionDocType) {
+                $typeValue = $collectionDocType;
+            }
+        }
 
-        return new Argument($name, $type, $isNullable, $isArray);
+        $type = new AnalyzerClassName($typeValue, NameType::UNKNOWN);
+
+        return new Argument($name, $type, $isNullable, $isCollection);
     }
 
-    private function getTypeAsString(?Node $node): string
+    private static function getTypeAsString(?Node $node): string
     {
         if ($node instanceof NullableType) {
             return (string) $node->type;
@@ -193,10 +167,10 @@ final class ClassAnalyzer extends NodeVisitorAbstract
             return (string) $node;
         }
         if ($node instanceof UnionType) {
-            return implode('|', array_map(fn ($t) => $this->getTypeAsString($t), $node->types));
+            return implode('|', array_map(fn ($t) => self::getTypeAsString($t), $node->types));
         }
         if ($node instanceof IntersectionType) {
-            return implode('&', array_map(fn ($t) => $this->getTypeAsString($t), $node->types));
+            return implode('&', array_map(fn ($t) => self::getTypeAsString($t), $node->types));
         }
 
         return 'unknown';

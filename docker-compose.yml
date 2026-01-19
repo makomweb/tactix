@@ -1,0 +1,14 @@
+services:
+  tactix:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: tactix
+    working_dir: /var/www/project
+    volumes:
+      - ./:/var/www/project
+    user: "1000:1001"
+    environment:
+      - XDEBUG_MODE=coverage
+    tty: true
+    command: tail -f /dev/null
