@@ -57,6 +57,22 @@ Check::folder(__DIR__.'/src');
 
 Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about wether there are missing tags, ambiguity or forbidden relations.
 
+## Generating a report
+
+Tactix provides a Symfony Console command `tactix:report` that creates a static HTML report for a source folder.
+
+Essentials:
+
+- Run: `bin/console tactix:report <folder>` or `vendor/bin/console tactix:report <folder>`
+- Optional: `--out-dir=/path/to/base` (defaults to the project root / getcwd())
+- Output: writes `report/index.html` plus supporting files (`report.js`, `chart.js`, `styles.css`) into the chosen base dir
+
+Notes:
+
+- If `resources/report` exists in the package, those assets are copied; otherwise minimal defaults are generated.
+- The command prints discovered classes and forbidden relations and finishes with `Report written to: ./report/index.html`.
+
+
 ## Forbidden relations
 
 Tactix includes a small built-in blacklist (see `Tactix\Forbidden`) and reports violations as:
@@ -80,4 +96,3 @@ Guidelines for contributing improvements:
 - Follow PHPStan and php-cs-fixer rules. Running `composer cs` will apply fixer changes.
 - If you use the container workflow, prefer running tests inside the container to match CI.
 - Open pull requests targeting the `master` branch with a clear description of the change and a short test plan.
-
