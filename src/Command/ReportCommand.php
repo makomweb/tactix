@@ -42,6 +42,7 @@ final class ReportCommand extends Command
         $this
             ->addArgument('folder', InputArgument::REQUIRED, 'The source code folder to be checked')
             ->addOption('out-dir', null, InputOption::VALUE_REQUIRED, 'Base output directory for reports (defaults to project root)')
+            ->addOption('exclude-namespace', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Namespace prefix to exclude from the report (can be used multiple times)')
         ;
     }
 
@@ -78,27 +79,25 @@ final class ReportCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title(sprintf('Report for "%s"', $folder));
 
+        // Get user-provided namespace exclusions or use sensible defaults
+        /** @var string[] $excludeNamespaces */
+        $excludeNamespaces = $input->getOption('exclude-namespace');
+
+        // If no exclusions provided, use common vendor/framework namespaces as defaults
+        if (empty($excludeNamespaces)) {
+            $excludeNamespaces = [
+                'Doctrine\\',
+                'Symfony\\',
+                'Psr\\',
+            ];
+        }
+
         /** @var Node[] */
         $nodes = array_reduce(
             iterator_to_array(YieldNodes::from($folder)),
             new NodeReducer(
                 ignoreTypes: IgnoreableTypes::VALUES,
-                shouldNotStartWith: [
-                    'App\\Kernel',
-                    'App\\CLI\\',
-                    'App\\DDD\\',
-                    'Doctrine\\',
-                    'Symfony\\',
-                    'Psr\\',
-                    'PhpParser\\',
-                    'phpDocumentor\\',
-                    'Monolog\\',
-                    'OpenTelemetry\\',
-                    'Rx\\',
-                    'React\\',
-                    'InfluxDB2\\',
-                    'EasyCorp\\Bundle\\EasyAdminBundle\\',
-                ],
+                shouldNotStartWith: $excludeNamespaces,
                 shouldNotContain: [
                     'array<',
                     'array{',
