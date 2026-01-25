@@ -42,7 +42,7 @@ use PHPMolecules\DDD\Attribute\Repository;
 final class User {}
 ```
 
-### 2. Check your classes or folders
+### 2. Either Check your classes or folders manually
 
 ```php
 use Tactix\Check;
@@ -55,23 +55,22 @@ Check::folder(__DIR__.'/src');
 - `Tactix\ClassViolationException`
 - `Tactix\FolderViolationException`
 
-Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about wether there are missing tags, ambiguity or forbidden relations.
+Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about whether there are missing tags, ambiguity or forbidden relations.
 
-## Generating a report
+### 3. Or generate a report for a specific folder
 
 Tactix provides a Symfony Console command `tactix:report` that creates a static HTML report for a source folder.
 
-Essentials:
-
-- Run: `bin/console tactix:report <folder>` or `vendor/bin/console tactix:report <folder>`
-- Optional: `--out-dir=/path/to/base` (defaults to the project root / getcwd())
-- Output: writes `report/index.html` plus supporting files (`report.js`, `chart.js`, `styles.css`) into the chosen base dir
+```bash
+# Run the report command for a folder.
+bin/console tactix:report <folder>
+# or, when installed as a dependency with optional output directory
+vendor/bin/console tactix:report <folder> --out-dir=<out-dir>
+```
 
 Notes:
-
-- If `resources/report` exists in the package, those assets are copied; otherwise minimal defaults are generated.
-- The command prints discovered classes and forbidden relations and finishes with `Report written to: ./report/index.html`.
-
+- the output files index.html, report.js, chart.js, styles.css are created
+- the command prints discovered classes and forbidden relations and finishes with `Report written to: ./report/index.html`.
 
 ## Forbidden relations
 
