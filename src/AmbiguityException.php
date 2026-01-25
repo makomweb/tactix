@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tactix;
 
-class AmbiguityException extends \Exception
+class AmbiguityException extends TactixException
 {
     /** @param class-string $className */
     public function __construct(

@@ -1,69 +1,116 @@
 # AGENTS
 
-Concise reference for agents working on this repository. Only documents observed, current project facts and commands.
+Concise reference for agents working on this repository. Only document facts observed in the repository — do not invent commands or conventions.
 
 ---
 
 ## Quick facts
 
 - Language: PHP (composer.json)
-- PHP requirement: ^8.2
-- Package: makomweb/tactix
-- PSR-4 autoload: `Tactix\` -> `src/`; tests autoload `Tactix\Tests\` -> `tests/`
+- PHP requirement: ^8.2 (composer.json)
+- Package name: makomweb/tactix (composer.json)
+- Package type: library
+- Autoload (PSR-4): `Tactix\` -> `src/` (composer.json)
+- Test autoload (PSR-4): `Tactix\Tests\` -> `tests/` (composer.json)
 - Tests: PHPUnit (vendor/bin/phpunit)
 - Static analysis: PHPStan (phpstan.neon.dist)
-- Code style: php-cs-fixer (.php-cs-fixer.dist.php)
+- Code style: PHP-CS-Fixer (.php-cs-fixer.dist.php)
+- CI: GitHub Actions workflow .github/workflows/app-ci.yaml runs phpstan, php-cs-fixer (check) and phpunit
 
-## Repo layout (observed)
+## Repository layout (observed)
 
-- src/ (library code)
-- tests/Unit (PHPUnit tests) and tests/Data (fixtures)
-- .github/workflows/app-ci.yaml (CI runs phpstan, php-cs-fixer, phpunit)
-- docker/ (docker/php/Dockerfile) — image built from php:8.4-cli, includes xdebug and composer
-- docker-compose.yml — service name: `tactix`, mounts repository at `/var/www/project`
-- Makefile — targets: build, up, down, test-container, shell
+- src/ — library code (primary implementation)
+  - Analyzer/ — static PHP source analysis helpers
+  - DependencyInjection/ — Symfony DI extension & configuration
+  - Command/ — console/report command
+  - Assert/ — assertion helpers used in tests
+  - Several root classes: Check.php, Forbidden.php, AttributeName.php, etc.
+- tests/ — test code
+  - Unit/ — PHPUnit unit tests
+  - Data/ — test fixtures (small PHP files used by analyzers)
+- resources/ — static JS/CSS report template (resources/report)
+- docker/ — Dockerfile for development image (docker/php/Dockerfile)
+- .github/workflows/app-ci.yaml — CI definition
+- Makefile — convenience targets for container workflow
+- composer.json / composer.lock — dependencies, scripts and QA commands
+- phpunit.xml.dist — PHPUnit configuration
+- phpstan.neon.dist — PHPStan configuration
 
-## Container-based workflow (what to use)
+## How to run (local and container)
 
-Observed, supported workflow to run tests in a container using standard tooling:
+Local (host):
+- Install deps: composer install
+- Run tests: composer test  (equivalent to vendor/bin/phpunit)
+- Run QA (static analysis + style + tests): composer qa
+- Run phpstan only: composer sa
+- Run php-cs-fixer (will modify files): composer cs
 
-- Build image: make build
-- Start service: make up
-- Install deps (inside container): docker exec -u 1000 tactix sh -c 'cd /var/www/project && composer install --no-interaction'
-- Run tests (inside service): make test-container  OR docker exec -u 1000 tactix sh -c 'cd /var/www/project && vendor/bin/phpunit --configuration phpunit.xml.dist --testdox'
-- Open shell in running container: make shell
+Container (recommended for reproducible env):
+- Build image: make build  (Makefile -> `docker compose build`)
+- Start service: make up    (Makefile -> `docker compose up -d`)
+- Enter shell in running container: make shell  (opens sh)
+- Install dependencies inside container: docker exec -u 1000 tactix sh -c 'cd /var/www/project && composer install --no-interaction'
+- Run tests inside container: make test (Makefile target runs vendor/bin/phpunit in container)
+- Run QA inside container: make qa  (runs composer qa inside container)
 
-Makefile runs `docker compose` so use Docker Compose v2+ (command: `docker compose ...`).
+Notes:
+- Makefile uses `docker compose` (Docker Compose v2+). Service/container name is `tactix` and repository is mounted at `/var/www/project` inside the container.
+- Container runs as UID 1000:GID 1001 (image built by docker/php/Dockerfile).
+- The container sets XDEBUG_MODE=coverage to enable coverage when xdebug is present.
 
-Notes about the container setup:
+## CI details
 
-- Service key in docker-compose.yml is `tactix` and container_name is `tactix`.
-- Repository is mounted at `/var/www/project` inside the container.
-- Container runs as UID 1000:GID 1001 (user: "1000:1001").
-- Dockerfile (docker/php/Dockerfile) is based on `php:8.4-cli`, installs xdebug and copies Composer binary from the composer image.
-- The compose service sets `XDEBUG_MODE=coverage` so PHPUnit can generate coverage when xdebug is present.
+- Workflow: .github/workflows/app-ci.yaml
+- Runs on ubuntu-latest and tests matrix contains php-version: 8.4
+- Steps: checkout, setup-php (shivammathur/setup-php), composer install (no-scripts), phpstan analyse, php-cs-fixer check, phpunit
+- Environment: sets PHP_CS_FIXER_IGNORE_ENV=1 and DATABASE_URL=sqlite:///:memory:
 
-## PHPUnit configuration
+## Code organization and patterns
 
-- PHPUnit configuration file: `phpunit.xml.dist`.
-- PHPUnit is configured to NOT stop on errors (stopOnError="false").
-- Tests bootstrap via `tests/bootstrap.php` which requires Composer autoloader; ensure dependencies installed before running tests.
+- Attributes-based tagging: The library works with PHPMolecules attributes (AggregateRoot, Entity, ValueObject, Factory, Service, Repository). See src/AttributeName.php for mapping and helpers.
+  - AttributeName enum maps semantic names to actual attribute class FQCNs and provides AttributeName::fromAttributeClass(string) (src/AttributeName.php)
+- Static analysis: src/Analyzer contains many classes to parse PHP files, analyze nodes, relations and produce Violation objects.
+- Public API: Tactix\Check (src/Check.php) provides helpers to check a single class (Check::className) or a folder (Check::folder).
+- Forbidden relations: src/Forbidden.php contains a hard-coded blacklist (createBlackList()). If you add new AttributeName enum values you must update this list or Forbidden::check() will throw a LogicException (see src/Forbidden.php:19-28).
+- Reports: resources/report contains a small static HTML/JS/CSS report template used by the Report command (src/Command/*).
+- DependencyInjection: Symfony DI extension and configuration present under src/DependencyInjection (Configuration.php, TactixExtension.php) for integration in Symfony apps.
 
-## Commands (summary)
+## Testing strategy and patterns
 
-- Local composer install: `composer install`
-- Run tests locally (host): `composer test` (vendor/bin/phpunit)
-- Run QA: `composer qa` (phpstan, php-cs-fixer, phpunit)
-- Container build: `make build`
-- Container up: `make up`
-- Run tests in container: `make test-container` (invokes `docker compose run --rm tactix vendor/bin/phpunit ...`)
-- Shell into running container: `make shell`
+- Tests live in tests/Unit and use PHPUnit. Fixtures for analyzer tests are small PHP files under tests/Data.
+- Bootstrap file: tests/bootstrap.php requires vendor/autoload.php and sets umask when APP_DEBUG is true.
+- Common test helpers/assertions are available in src/Assert (and used in tests).
+- When adding features, add unit tests in tests/Unit and fixtures in tests/Data as needed.
 
-## Gotchas / important notes
+## Composer scripts and QA
 
-- If you add new AttributeName values, update the hard-coded blacklist in `src/Forbidden.php` or `Forbidden::check()` will throw a LogicException.
-- `composer qa` runs php-cs-fixer in "fix" mode (will modify files in-place); CI uses php-cs-fixer check.
-- The container workflow relies on the docker/php/Dockerfile. If you remove or change it, update docker-compose.yml accordingly.
+- composer test -> vendor/bin/phpunit
+- composer qa -> runs phpstan analyse --memory-limit=1G, php-cs-fixer fix, and phpunit (note: php-cs-fixer runs in fix mode here)
+- composer sa -> phpstan only
+- composer cs -> php-cs-fixer fix
+
+CI runs php-cs-fixer in check mode (see .github/workflows/app-ci.yaml), while composer qa runs the fixer in fix mode locally. Be mindful: composer qa will modify files in-place.
+
+## Important gotchas / notes for agents
+
+- Forbidden blacklist: src/Forbidden.php creates an explicit list for every AttributeName. Forbidden::check() will throw a LogicException if a 'from' AttributeName has no entry — update createBlackList() when adding enum values.
+  - Reference: src/Forbidden.php:19-28 and createBlackList() implementation
+- PHP version: CI uses PHP 8.4 in the workflow (matrix). composer.json requires ^8.2.
+- php-cs-fixer: composer qa runs php-cs-fixer in fix mode. CI runs the fixer in check mode — prefer running QA inside the container to reproduce CI.
+- Tests and analyzers rely on small PHP fixtures in tests/Data; maintain their formatting and namespaces when adding new cases.
+
+## Files of interest (quick jump targets)
+
+- src/AttributeName.php
+- src/Forbidden.php
+- src/Check.php
+- src/Analyzer/PhpFileAnalyzer.php
+- src/Command/ReportCommand.php
+- composer.json
+- phpunit.xml.dist
+- phpstan.neon.dist
+- Makefile
+- .github/workflows/app-ci.yaml
 
 ---
 

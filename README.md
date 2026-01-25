@@ -42,7 +42,7 @@ use PHPMolecules\DDD\Attribute\Repository;
 final class User {}
 ```
 
-### 2. Check your classes or folders
+### 2. Either Check your classes or folders manually
 
 ```php
 use Tactix\Check;
@@ -55,7 +55,28 @@ Check::folder(__DIR__.'/src');
 - `Tactix\ClassViolationException`
 - `Tactix\FolderViolationException`
 
-Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about wether there are missing tags, ambiguity or forbidden relations.
+Both exceptions contain a `$violations` property of type `array<Tactix\Violation>` to get further details about whether there are missing tags, ambiguity or forbidden relations.
+
+### 3. Or generate a report for a specific folder
+
+Tactix provides a Symfony Console command `tactix:report` that creates a static HTML report for a source folder.
+
+```bash
+# Run the report command for a folder.
+bin/console tactix:report <folder>
+# or, when installed as a dependency with optional output directory
+vendor/bin/console tactix:report <folder> --out-dir=<out-dir>
+# Exclude specific namespaces from the report (can be used multiple times)
+vendor/bin/console tactix:report <folder> --exclude-namespace="App\\CLI\\" --exclude-namespace="App\\Infrastructure\\"
+```
+
+Options:
+- `--out-dir`: Base output directory for reports (defaults to project root)
+- `--exclude-namespace`: Namespace prefix to exclude from the report (can be used multiple times). By default, `Doctrine\\`, `Symfony\\`, and `Psr\\` namespaces are excluded. When you provide your own exclusions, you replace these defaults.
+
+Notes:
+- the output files index.html, report.js, chart.js, styles.css are created
+- the command prints discovered classes and forbidden relations and finishes with `Report written to: ./report/index.html`.
 
 ## Forbidden relations
 
@@ -65,27 +86,18 @@ Tactix includes a small built-in blacklist (see `Tactix\Forbidden`) and reports 
 (MyValueObject)-[consumes]->(MyEntity) is a forbidden relation! ❌
 ```
 
-## Container-based workflow
+## Contributing
 
 This repository includes a lightweight container workflow to run tests and analysis in a reproducible environment.
 
-- Build image: `make build` (requires Docker and Docker Compose v2+)
-- Start service: `make up`
-- Install dependencies inside container: `docker exec -u 1000 tactix sh -c 'cd /var/www/project && composer install --no-interaction'`
-- Run tests in container: `make test` or `docker exec -u 1000 tactix sh -c 'cd /var/www/project && vendor/bin/phpunit --configuration phpunit.xml.dist --testdox'`
+- Build image: `make build` (requires Docker and Docker Compose)
 - Open shell in running container: `make shell`
-
-Notes:
-- The container mounts the repository at `/var/www/project` and runs as UID 1000:GID 1001.
-- The Dockerfile used is at `docker/php/Dockerfile` and is based on the official `php:8.4-cli` image. It installs Composer and Xdebug to allow coverage reporting.
-
-## Contributing
 
 Guidelines for contributing improvements:
 
+- Install dependencies via `composer install` from within the development container
 - Run the QA suite locally before opening a PR: `composer qa` (runs PHPStan, php-cs-fixer and PHPUnit).
 - Prefer adding unit tests for new features or bug fixes; tests are in `tests/Unit`.
 - Follow PHPStan and php-cs-fixer rules. Running `composer cs` will apply fixer changes.
 - If you use the container workflow, prefer running tests inside the container to match CI.
 - Open pull requests targeting the `master` branch with a clear description of the change and a short test plan.
-

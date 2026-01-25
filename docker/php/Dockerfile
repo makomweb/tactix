@@ -1,4 +1,4 @@
-FROM php:8.4-cli
+FROM php:8.2-cli
 
 # Install common extensions and tools used in tests and by composer
 RUN apt-get update \
