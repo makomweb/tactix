@@ -1,4 +1,4 @@
-// Mapping keys to human readible names
+// Mapping keys to human readable names
 const categoryMapping = {
     'aggregate_roots': 'Aggregate Root',
     'entities': 'Entity',

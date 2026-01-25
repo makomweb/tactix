@@ -59,7 +59,7 @@ final class ReportCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            self::doExecute($input, $output);
+            $this->doExecute($input, $output);
 
             return Command::SUCCESS;
         } catch (TactixException $ex) {

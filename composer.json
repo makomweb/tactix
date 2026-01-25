@@ -36,12 +36,6 @@
         "friendsofphp/php-cs-fixer": "^3.92",
         "phpunit/phpunit": "^11"
     },
-    "suggest": {
-        "symfony/http-kernel": "Required to use the Bundle and DI extension (install in consuming apps)",
-        "symfony/dependency-injection": "Required to use the Bundle and DI extension (install in consuming apps)",
-        "symfony/config": "Required to use the Bundle and DI extension (install in consuming apps)",
-        "symfony/yaml": "Required to use the Bundle and DI extension (install in consuming apps)"
-    },
     "scripts": {
         "qa": [
             "vendor/bin/phpstan analyse --memory-limit=1G",
