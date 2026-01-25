@@ -1,4 +1,4 @@
-// Mapping keys to human readible names
+// Mapping keys to human readable names
 const categoryMapping = {
     'aggregate_roots': 'Aggregate Root',
     'entities': 'Entity',
@@ -218,7 +218,7 @@ function createClassesTable() {
 
     // Summary count
     const summary = document.createElement("p");
-    summary.textContent = `Gesamt: ${allClasses.length} Klassen`;
+    summary.textContent = `Total: ${allClasses.length} classes`;
     summary.style.textAlign = "center";
     summary.style.marginTop = "10px";
     summary.style.fontWeight = "600";
