@@ -212,11 +212,15 @@ final class ReportCommand extends Command
         // Ensure destination directory exists (destination is typically 'report/report.js')
         $dir = dirname($destination);
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            if (!mkdir($dir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Failed to create directory "%s". Check permissions and disk space.', $dir));
+            }
         }
 
         // Write the JS data file (report.js)
-        file_put_contents($destination, 'const reportData = '.$json.';');
+        if (false === file_put_contents($destination, 'const reportData = '.$json.';')) {
+            throw new \RuntimeException(sprintf('Failed to write report data to "%s". Check permissions and disk space.', $destination));
+        }
 
         // Ensure static assets (chart.js, styles.css) are available in the report directory.
         // Prefer packaged templates under resources/report, otherwise create sensible defaults.
@@ -224,7 +228,9 @@ final class ReportCommand extends Command
 
         // chart.js
         if (is_file($resourceDir.'/chart.js')) {
-            copy($resourceDir.'/chart.js', $dir.'/chart.js');
+            if (!copy($resourceDir.'/chart.js', $dir.'/chart.js')) {
+                throw new \RuntimeException(sprintf('Failed to copy chart.js from "%s" to "%s". Check permissions and disk space.', $resourceDir.'/chart.js', $dir.'/chart.js'));
+            }
         } else {
             // default minimal chart script inspired by tbone's chart.js using ECharts
             $defaultChartJs = <<<'JS'
@@ -291,12 +297,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 JS;
-            file_put_contents($dir.'/chart.js', $defaultChartJs);
+            if (false === file_put_contents($dir.'/chart.js', $defaultChartJs)) {
+                throw new \RuntimeException(sprintf('Failed to write default chart.js to "%s". Check permissions and disk space.', $dir.'/chart.js'));
+            }
         }
 
         // styles.css
         if (is_file($resourceDir.'/styles.css')) {
-            copy($resourceDir.'/styles.css', $dir.'/styles.css');
+            if (!copy($resourceDir.'/styles.css', $dir.'/styles.css')) {
+                throw new \RuntimeException(sprintf('Failed to copy styles.css from "%s" to "%s". Check permissions and disk space.', $resourceDir.'/styles.css', $dir.'/styles.css'));
+            }
         } else {
             $defaultCss = <<<'CSS'
 body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin: 16px; }
@@ -305,7 +315,9 @@ h1 { text-align: center; }
 .chart-container { border:1px solid #ddd; border-radius:8px; padding:6px; }
 #classesTableContainer { max-width: 1000px; margin: 0 auto; }
 CSS;
-            file_put_contents($dir.'/styles.css', $defaultCss);
+            if (false === file_put_contents($dir.'/styles.css', $defaultCss)) {
+                throw new \RuntimeException(sprintf('Failed to write default styles.css to "%s". Check permissions and disk space.', $dir.'/styles.css'));
+            }
         }
 
         // index.html referencing the static assets. Use ECharts CDN and include chart.js and report.js
@@ -345,6 +357,8 @@ CSS;
 </html>
 HTML;
 
-        file_put_contents($dir.'/index.html', $indexHtml);
+        if (false === file_put_contents($dir.'/index.html', $indexHtml)) {
+            throw new \RuntimeException(sprintf('Failed to write index.html to "%s". Check permissions and disk space.', $dir.'/index.html'));
+        }
     }
 }
