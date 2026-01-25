@@ -9,6 +9,9 @@ use Tactix\Command\Report;
 
 final class ReportNormalizer implements NormalizerInterface
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         assert($object instanceof Report);

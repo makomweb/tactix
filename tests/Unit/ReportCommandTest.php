@@ -88,6 +88,7 @@ final class ReportCommandTest extends TestCase
 
         $reportJsPath = $this->tempDir.'/report/report.js';
         $content = file_get_contents($reportJsPath);
+        self::assertNotFalse($content, 'Failed to read report.js file');
 
         self::assertStringStartsWith('const reportData = ', $content);
         self::assertStringContainsString('"folder":', $content);
@@ -109,6 +110,7 @@ final class ReportCommandTest extends TestCase
 
         $htmlPath = $this->tempDir.'/report/index.html';
         $content = file_get_contents($htmlPath);
+        self::assertNotFalse($content, 'Failed to read index.html file');
 
         self::assertStringContainsString('<!DOCTYPE html>', $content);
         self::assertStringContainsString('<title>Charts Report</title>', $content);
@@ -127,6 +129,7 @@ final class ReportCommandTest extends TestCase
 
         // Change to temp directory before running command
         $originalDir = getcwd();
+        self::assertNotFalse($originalDir, 'Failed to get current working directory');
         chdir($this->tempDir);
 
         try {
