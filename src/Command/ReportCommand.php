@@ -216,10 +216,14 @@ final class ReportCommand extends Command
 
         $reportDir = dirname($reportJsPath);
         if (!is_dir($reportDir)) {
-            mkdir($reportDir, 0777, true);
+            if (!mkdir($reportDir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Failed to create directory "%s". Check permissions and disk space.', $reportDir));
+            }
         }
 
-        file_put_contents($reportJsPath, 'const reportData = '.$json.';');
+        if (false === file_put_contents($reportJsPath, 'const reportData = '.$json.';')) {
+            throw new \RuntimeException(sprintf('Failed to write report data to "%s". Check permissions and disk space.', $reportJsPath));
+        }
 
         $resourceDir = __DIR__.'/../../resources/report';
         if (is_dir($resourceDir)) {
@@ -229,7 +233,9 @@ final class ReportCommand extends Command
                     continue;
                 }
 
-                copy($resourceDir.'/'.$item, $reportDir.'/'.$item);
+                if (!copy($resourceDir.'/'.$item, $reportDir.'/'.$item)) {
+                    throw new \RuntimeException(sprintf('Failed to copy from "%s" to "%s". Check permissions and disk space.', $resourceDir.'/'.$item, $reportDir.'/'.$item));
+                }
             }
         }
     }
