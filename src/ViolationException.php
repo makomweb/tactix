@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tactix;
 
-class ViolationException extends \Exception
+class ViolationException extends TactixException
 {
     /**
      * @param Violation[] $violations
