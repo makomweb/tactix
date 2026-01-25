@@ -67,12 +67,12 @@ bin/console tactix:report <folder>
 # or, when installed as a dependency with optional output directory
 vendor/bin/console tactix:report <folder> --out-dir=<out-dir>
 # Exclude specific namespaces from the report (can be used multiple times)
-vendor/bin/console tactix:report <folder> --exclude-namespace="App\\Kernel" --exclude-namespace="App\\CLI\\"
+vendor/bin/console tactix:report <folder> --exclude-namespace="App\\CLI\\" --exclude-namespace="App\\Infrastructure\\"
 ```
 
 Options:
 - `--out-dir`: Base output directory for reports (defaults to project root)
-- `--exclude-namespace`: Namespace prefix to exclude from the report (can be used multiple times). By default, `Doctrine\`, `Symfony\`, and `Psr\` namespaces are excluded. When you provide your own exclusions, you replace these defaults.
+- `--exclude-namespace`: Namespace prefix to exclude from the report (can be used multiple times). By default, `Doctrine\\`, `Symfony\\`, and `Psr\\` namespaces are excluded. When you provide your own exclusions, you replace these defaults.
 
 Notes:
 - the output files index.html, report.js, chart.js, styles.css are created
