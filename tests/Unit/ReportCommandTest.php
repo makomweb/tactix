@@ -239,7 +239,12 @@ final class ReportCommandTest extends TestCase
             return;
         }
 
-        $files = array_diff(scandir($dir), ['.', '..']);
+        $files = scandir($dir);
+        if (false === $files) {
+            return;
+        }
+
+        $files = array_diff($files, ['.', '..']);
         foreach ($files as $file) {
             $path = $dir.'/'.$file;
             is_dir($path) ? $this->removeDirectory($path) : unlink($path);
