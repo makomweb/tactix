@@ -1,12 +1,14 @@
 # Tactix
 
 ![app-ci-workflow](https://github.com/makomweb/tactix/actions/workflows/app-ci.yaml/badge.svg)
+[![codecov](https://codecov.io/github/makomweb/tactix/graph/badge.svg?token=LBDBUCWP6A)](https://codecov.io/github/makomweb/tactix)
 
 Tactical DDD, simplified for PHP: tag your classes (via PHP attributes) forbidden relations.
 
 <p align="center">
   <img src="./assets/logo.png" alt="project-logo" width="300"/>
 </p>
+
 
 ## Installation
 
