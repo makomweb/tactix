@@ -8,9 +8,8 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
-        'php_unit_method_casing' => [
-            'case' => 'snake_case'
-        ],
+        'php_unit_method_casing' => ['case' => 'snake_case'],
+        'phpdoc_to_comment' => ['ignored_tags' => ['var']],
     ])
     ->setFinder($finder)
 ;

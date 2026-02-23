@@ -6,13 +6,8 @@ namespace Tactix;
 
 final readonly class Check
 {
-    private function __construct(private YieldViolations $yieldViolations)
+    public function __construct(private YieldViolations $yieldViolations)
     {
-    }
-
-    public static function fromBlacklist(Blacklist $blacklist): self
-    {
-        return new self(new YieldViolations($blacklist));
     }
 
     /**

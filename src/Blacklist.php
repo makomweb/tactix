@@ -8,7 +8,7 @@ use Tactix\Analyzer\Relation;
 
 final readonly class Blacklist
 {
-    public const DEFAULT = [
+    public const DEFAULT_DATA = [
         'Entity' => [
             'Factory',
             'Service',
@@ -32,10 +32,11 @@ final readonly class Blacklist
      * Format: ['FROM_ATTRIBUTE' => ['TO_ATTRIBUTE1', 'TO_ATTRIBUTE2'], ...]
      * Attribute names should match AttributeName enum values.
      *
-     * @param array<string, array<string>> $blacklist If empty, uses DEFAULT
+     * @param array<string, array<string>> $data
      */
-    public function __construct(public array $blacklist = [])
+    public function __construct(public array $data)
     {
+        assert(!empty($data));
     }
 
     public function isForbidden(Relation $relation): bool
@@ -53,7 +54,7 @@ final readonly class Blacklist
      */
     private function check(AttributeName $from, AttributeName $to): bool
     {
-        foreach ($this->buildRules() as $rule) {
+        foreach ($this->getRules() as $rule) {
             if ($rule['from'] === $from) {
                 return in_array($to, $rule['to'], true);
             }
@@ -63,14 +64,14 @@ final readonly class Blacklist
     }
 
     /**
-     * Build rules from configuration, converting string names to AttributeName enums.
+     * Get rules from configuration, converting string names to AttributeName enums.
      *
      * @return array<int, array{from: AttributeName, to: AttributeName[]}>
      */
-    private function buildRules(): array
+    private function getRules(): array
     {
         $rules = [];
-        foreach ($this->blacklist as $fromValue => $toValues) {
+        foreach ($this->data as $fromValue => $toValues) {
             try {
                 $from = AttributeName::from($fromValue);
                 $to = array_map(

@@ -6,11 +6,12 @@ namespace Tactix\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Tactix\Blacklist;
+use Tactix\BlacklistFactory;
 use Tactix\Check;
 use Tactix\ClassViolationException;
 use Tactix\FolderViolationException;
 use Tactix\Tests\Data\MyValueObject;
+use Tactix\YieldViolations;
 
 final class ForbiddenRelationsTest extends TestCase
 {
@@ -19,7 +20,7 @@ final class ForbiddenRelationsTest extends TestCase
     {
         $folder = __DIR__.'/../Data';
 
-        $check = Check::fromBlacklist(new Blacklist(Blacklist::DEFAULT));
+        $check = new Check(new YieldViolations(BlacklistFactory::load()));
 
         try {
             $check->folder($folder);
@@ -34,7 +35,7 @@ final class ForbiddenRelationsTest extends TestCase
     #[Test]
     public function class_with_forbidden_dependency_should_throw(): void
     {
-        $check = Check::fromBlacklist(new Blacklist(Blacklist::DEFAULT));
+        $check = new Check(new YieldViolations(BlacklistFactory::load()));
 
         try {
             $check->className(MyValueObject::class);

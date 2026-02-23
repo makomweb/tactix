@@ -21,7 +21,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayPrototype()
                     ->scalarPrototype()->end()
                 ->end()
-                ->defaultValue(Blacklist::DEFAULT)
+                ->defaultValue(Blacklist::DEFAULT_DATA)
             ->end()
         ->end();
 
