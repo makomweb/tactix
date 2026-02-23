@@ -6,6 +6,7 @@ namespace Tactix\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Tactix\Blacklist;
 use Tactix\Check;
 use Tactix\ClassViolationException;
 use Tactix\FolderViolationException;
@@ -18,8 +19,10 @@ final class ForbiddenRelationsTest extends TestCase
     {
         $folder = __DIR__.'/../Data';
 
+        $check = Check::fromBlacklist(new Blacklist());
+
         try {
-            Check::folder($folder);
+            $check->folder($folder);
             self::fail('Should have thrown before!');
         } catch (FolderViolationException $ex) {
             self::assertSame(sprintf('Folder %s has 1 violation(s)!', $folder), $ex->getMessage());
@@ -31,8 +34,10 @@ final class ForbiddenRelationsTest extends TestCase
     #[Test]
     public function class_with_forbidden_dependency_should_throw(): void
     {
+        $check = Check::fromBlacklist(new Blacklist());
+
         try {
-            Check::className(MyValueObject::class);
+            $check->className(MyValueObject::class);
             self::fail('Should have thrown before!');
         } catch (ClassViolationException $ex) {
             self::assertSame(sprintf('Class %s has 1 violation(s)!', MyValueObject::class), $ex->getMessage());

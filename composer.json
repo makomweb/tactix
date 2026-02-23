@@ -1,6 +1,7 @@
 {
     "name": "makomweb/tactix",
     "description": "Tooling for tactical domain driven design",
+    "version": "0.1.6",
     "type": "library",
     "license": "MIT",
     "autoload": {

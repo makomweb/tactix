@@ -9,6 +9,10 @@ use Tactix\Analyzer\YieldRelations;
 
 final readonly class YieldViolations
 {
+    public function __construct(private Blacklist $blacklist)
+    {
+    }
+
     /**
      * Yield violations for the classes in the specified folder.
      *
@@ -16,7 +20,7 @@ final readonly class YieldViolations
      *
      * @return \Generator<Violation>
      */
-    public static function fromFolder(string $folder): \Generator
+    public function fromFolder(string $folder): \Generator
     {
         if (!is_dir($folder)) {
             throw new \InvalidArgumentException("{$folder} is not a directory!");
@@ -29,7 +33,7 @@ final readonly class YieldViolations
 
         /* Yield a violation for every forbidden relation within this folder. */
         foreach (YieldRelations::fromFolder($folder) as $relation) {
-            if ($relation->isForbidden()) {
+            if ($this->blacklist->isForbidden($relation)) {
                 yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
             }
         }
@@ -40,7 +44,7 @@ final readonly class YieldViolations
      *
      * @return \Generator<Violation>
      */
-    public static function fromClassName(string $className): \Generator
+    public function fromClassName(string $className): \Generator
     {
         /* Interfaces do not carry tags nor create violations. */
         if (interface_exists($className)) {
@@ -65,7 +69,7 @@ final readonly class YieldViolations
 
         /* Yield a violation for every forbidden relation this class has. */
         foreach (YieldRelations::fromClassName($className) as $relation) {
-            if ($relation->isForbidden()) {
+            if ($this->blacklist->isForbidden($relation)) {
                 yield new Violation(sprintf('%s is a forbidden relation! ❌', $relation));
             }
         }

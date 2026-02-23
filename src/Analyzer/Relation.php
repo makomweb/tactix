@@ -6,7 +6,6 @@ namespace Tactix\Analyzer;
 
 use Tactix\AttributeName;
 use Tactix\AttributeNameFactory;
-use Tactix\Forbidden;
 
 final readonly class Relation implements \Stringable
 {
@@ -20,14 +19,6 @@ final readonly class Relation implements \Stringable
     public static function create(Node $from, Edge $edge, Node $to): self
     {
         return new self($from, $edge, $to);
-    }
-
-    public function isForbidden(): bool
-    {
-        $from = $this->getFromAttribute();
-        $to = $this->getToAttribute();
-
-        return $from && $to && Forbidden::check($from, $to);
     }
 
     public function equals(self $other): bool

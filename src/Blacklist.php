@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tactix;
 
+use Tactix\Analyzer\Relation;
+
 final readonly class Blacklist
 {
     public const DEFAULT = [
@@ -25,19 +27,23 @@ final readonly class Blacklist
         'Service' => [],
     ];
 
-    /** @var array<string, string[]>|null */
-    private static ?array $customBlacklist = null;
-
     /**
-     * Set custom blacklist configuration at runtime.
+     * Create a new Blacklist instance.
      * Format: ['FROM_ATTRIBUTE' => ['TO_ATTRIBUTE1', 'TO_ATTRIBUTE2'], ...]
      * Attribute names should match AttributeName enum values.
      *
-     * @param array<string, array<string>> $blacklist
+     * @param array<string, array<string>> $blacklist If empty, uses DEFAULT
      */
-    public static function setBlacklist(array $blacklist): void
+    public function __construct(public array $blacklist = [])
     {
-        self::$customBlacklist = $blacklist;
+    }
+
+    public function isForbidden(Relation $relation): bool
+    {
+        $from = $relation->getFromAttribute();
+        $to = $relation->getToAttribute();
+
+        return $from && $to && $this->check($from, $to);
     }
 
     /**
@@ -45,9 +51,9 @@ final readonly class Blacklist
      *
      * @throws \LogicException If the from attribute has no blacklist entry
      */
-    public static function check(AttributeName $from, AttributeName $to): bool
+    private function check(AttributeName $from, AttributeName $to): bool
     {
-        foreach (self::buildRules() as $rule) {
+        foreach ($this->buildRules() as $rule) {
             if ($rule['from'] === $from) {
                 return in_array($to, $rule['to'], true);
             }
@@ -61,12 +67,10 @@ final readonly class Blacklist
      *
      * @return array<int, array{from: AttributeName, to: AttributeName[]}>
      */
-    private static function buildRules(): array
+    private function buildRules(): array
     {
-        $config = self::$customBlacklist ?? self::DEFAULT;
-
         $rules = [];
-        foreach ($config as $fromValue => $toValues) {
+        foreach ($this->blacklist as $fromValue => $toValues) {
             try {
                 $from = AttributeName::from($fromValue);
                 $to = array_map(
@@ -83,15 +87,5 @@ final readonly class Blacklist
         }
 
         return $rules;
-    }
-
-    /**
-     * Create a new Blacklist instance.
-     * Format: ['FROM_ATTRIBUTE' => ['TO_ATTRIBUTE1', 'TO_ATTRIBUTE2'], ...]
-     *
-     * @param array<string, array<string>> $blacklist If empty, uses DEFAULT
-     */
-    public function __construct(public array $blacklist = [])
-    {
     }
 }
