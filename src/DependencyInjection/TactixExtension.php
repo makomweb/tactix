@@ -19,7 +19,9 @@ final class TactixExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('tactix.blacklist', $config['blacklist']);
+        /** @var array<string, array<string>> $blacklist */
+        $blacklist = $config['blacklist'];
+        $container->setParameter('tactix.blacklist', $blacklist);
     }
 
     public function getAlias(): string

@@ -12,7 +12,7 @@ final readonly class Check
 
     public static function fromBlacklist(Blacklist $blacklist): self
     {
-        return new self(new YieldViolations($blacklist));   
+        return new self(new YieldViolations($blacklist));
     }
 
     /**

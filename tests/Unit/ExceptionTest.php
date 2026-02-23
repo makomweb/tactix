@@ -15,7 +15,7 @@ final class ExceptionTest extends TestCase
     #[Test]
     public function exception_class_should_not_yield_violation(): void
     {
-        $yieldViolations = new YieldViolations(new Blacklist());
+        $yieldViolations = new YieldViolations(new Blacklist(Blacklist::DEFAULT));
 
         $violations = iterator_to_array($yieldViolations->fromClassName(MyException::class));
         self::assertEmpty($violations);

@@ -19,7 +19,7 @@ final class ForbiddenRelationsTest extends TestCase
     {
         $folder = __DIR__.'/../Data';
 
-        $check = Check::fromBlacklist(new Blacklist());
+        $check = Check::fromBlacklist(new Blacklist(Blacklist::DEFAULT));
 
         try {
             $check->folder($folder);
@@ -34,7 +34,7 @@ final class ForbiddenRelationsTest extends TestCase
     #[Test]
     public function class_with_forbidden_dependency_should_throw(): void
     {
-        $check = Check::fromBlacklist(new Blacklist());
+        $check = Check::fromBlacklist(new Blacklist(Blacklist::DEFAULT));
 
         try {
             $check->className(MyValueObject::class);

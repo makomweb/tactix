@@ -16,8 +16,8 @@ final class MissingTagTest extends TestCase
     #[Test]
     public function class_without_tactical_tag_should_throw_with_details(): void
     {
-        $check = Check::fromBlacklist(new Blacklist());
-        
+        $check = Check::fromBlacklist(new Blacklist(Blacklist::DEFAULT));
+
         try {
             $check->className(MyWithoutTag::class);
             self::fail('Should have thrown before!');

@@ -36,9 +36,8 @@ final class ReportCommand extends Command
 {
     public function __construct(
         private readonly SerializerInterface $serializer,
-        private readonly Blacklist $blacklist
-    )
-    {
+        private readonly Blacklist $blacklist,
+    ) {
         parent::__construct();
     }
 

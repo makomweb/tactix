@@ -15,7 +15,7 @@ final class InterfaceTest extends TestCase
     #[Test]
     public function interface_should_not_yield_violation(): void
     {
-        $yieldViolations = new YieldViolations(new Blacklist());
+        $yieldViolations = new YieldViolations(new Blacklist(Blacklist::DEFAULT));
 
         $violations = iterator_to_array($yieldViolations->fromClassName(MyInterface::class));
         self::assertEmpty($violations);
