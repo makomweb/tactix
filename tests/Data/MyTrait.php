@@ -6,5 +6,5 @@ namespace Tactix\Tests\Data;
 
 trait MyTrait
 {
-    public int $value;
+    public readonly int $value;
 }
