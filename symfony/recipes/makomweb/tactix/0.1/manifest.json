@@ -1,0 +1,9 @@
+{
+    "manifests": {
+        "makomweb/tactix": {
+            "copy-from-recipe": {
+                "config/packages/tactix.yaml": "%CONFIG_DIR%/packages/tactix.yaml"
+            }
+        }
+    }
+}
