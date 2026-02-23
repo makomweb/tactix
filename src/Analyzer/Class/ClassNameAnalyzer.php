@@ -31,8 +31,20 @@ final class ClassNameAnalyzer extends NodeVisitorAbstract
             return null;
         }
 
-        if ($node instanceof Class_ || $node instanceof Interface_ || $node instanceof Enum_ || $node instanceof Trait_) {
-            assert(!is_null($node->name));
+        if ($node instanceof Class_) {
+            if (!is_null($node->name)) {
+                Assert::that(
+                    is_null($this->className),
+                    sprintf('Make sure "%s" contains only 1 class per file!', $this->filePath)
+                );
+                $this->className = $node->name->name;
+            }
+
+            return null;
+        }
+
+        if ($node instanceof Interface_ || $node instanceof Enum_ || $node instanceof Trait_) {
+            assert(!is_null($node->name), sprintf('💥 %s', get_debug_type($node)));
             Assert::that(
                 is_null($this->className),
                 sprintf('Make sure "%s" contains only 1 class per file!', $this->filePath)
