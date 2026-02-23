@@ -15,7 +15,20 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
         $rootNode->children()
-            ->scalarNode('some_option')->defaultNull()->end()
+            ->arrayNode('blacklist')
+                ->useAttributeAsKey('name')
+                ->arrayPrototype()
+                    ->scalarPrototype()->end()
+                ->end()
+                ->defaultValue([
+                    'Entity' => ['Factory', 'Service', 'AggregateRoot'],
+                    'ValueObject' => ['Entity', 'AggregateRoot', 'Repository', 'Factory', 'Service'],
+                    'AggregateRoot' => ['Factory'],
+                    'Repository' => ['Factory', 'Service'],
+                    'Factory' => ['Repository'],
+                    'Service' => [],
+                ])
+            ->end()
         ->end();
 
         return $treeBuilder;

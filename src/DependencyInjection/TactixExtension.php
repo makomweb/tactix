@@ -15,6 +15,11 @@ final class TactixExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../resources/config'));
         $loader->load('services.yaml');
+
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('tactix.blacklist', $config['blacklist']);
     }
 
     public function getAlias(): string

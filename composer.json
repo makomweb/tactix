@@ -51,5 +51,11 @@
         "cs": "Run the code style fixer",
         "sa": "Run the static analyzer",
         "test": "Run all tests locally"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^6.4 || ^7.4 || ^8.0"
+        }
     }
 }
