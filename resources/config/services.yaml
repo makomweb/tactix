@@ -6,7 +6,7 @@ services:
 
   Tactix\Blacklist:
     arguments:
-      $blacklist: '%tactix.blacklist%'
+      $data: '%tactix.blacklist%'
 
   Tactix\Command\ReportCommand:
     arguments:
