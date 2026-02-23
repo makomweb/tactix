@@ -6,6 +6,7 @@ namespace Tactix\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Tactix\Blacklist;
 
 final class Configuration implements ConfigurationInterface
 {
@@ -20,14 +21,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayPrototype()
                     ->scalarPrototype()->end()
                 ->end()
-                ->defaultValue([
-                    'Entity' => ['Factory', 'Service', 'AggregateRoot'],
-                    'ValueObject' => ['Entity', 'AggregateRoot', 'Repository', 'Factory', 'Service'],
-                    'AggregateRoot' => ['Factory'],
-                    'Repository' => ['Factory', 'Service'],
-                    'Factory' => ['Repository'],
-                    'Service' => [],
-                ])
+                ->defaultValue(Blacklist::DEFAULT)
             ->end()
         ->end();
 
