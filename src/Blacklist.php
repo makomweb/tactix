@@ -27,6 +27,9 @@ final readonly class Blacklist
         'Service' => [],
     ];
 
+    /** @var array<int, array{from: AttributeName, to: AttributeName[]}> */
+    private array $rules;
+
     /**
      * Create a new Blacklist instance.
      * Format: ['FROM_ATTRIBUTE' => ['TO_ATTRIBUTE1', 'TO_ATTRIBUTE2'], ...]
@@ -37,6 +40,7 @@ final readonly class Blacklist
     public function __construct(public array $data)
     {
         assert(!empty($data));
+        $this->rules = $this->buildRules($data);
     }
 
     public function isForbidden(Relation $relation): bool
@@ -54,7 +58,7 @@ final readonly class Blacklist
      */
     private function check(AttributeName $from, AttributeName $to): bool
     {
-        foreach ($this->getRules() as $rule) {
+        foreach ($this->rules as $rule) {
             if ($rule['from'] === $from) {
                 return in_array($to, $rule['to'], true);
             }
@@ -64,14 +68,16 @@ final readonly class Blacklist
     }
 
     /**
-     * Get rules from configuration, converting string names to AttributeName enums.
+     * Build rules from configuration, converting string names to AttributeName enums.
+     *
+     * @param array<string, array<string>> $data
      *
      * @return array<int, array{from: AttributeName, to: AttributeName[]}>
      */
-    private function getRules(): array
+    private function buildRules(array $data): array
     {
         $rules = [];
-        foreach ($this->data as $fromValue => $toValues) {
+        foreach ($data as $fromValue => $toValues) {
             try {
                 $from = AttributeName::from($fromValue);
                 $to = array_map(
