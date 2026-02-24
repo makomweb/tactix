@@ -6,17 +6,21 @@ namespace Tactix\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Tactix\BlacklistFactory;
 use Tactix\Check;
 use Tactix\ClassViolationException;
 use Tactix\Tests\Data\MyWithoutTag;
+use Tactix\YieldViolations;
 
 final class MissingTagTest extends TestCase
 {
     #[Test]
     public function class_without_tactical_tag_should_throw_with_details(): void
     {
+        $check = new Check(new YieldViolations(BlacklistFactory::load()));
+
         try {
-            Check::className(MyWithoutTag::class);
+            $check->className(MyWithoutTag::class);
             self::fail('Should have thrown before!');
         } catch (ClassViolationException $ex) {
             self::assertSame('Class Tactix\Tests\Data\MyWithoutTag has 1 violation(s)!', $ex->getMessage());

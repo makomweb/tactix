@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use Tactix\Assert\Assert;
 
@@ -42,8 +43,8 @@ final class ClassNameAnalyzer extends NodeVisitorAbstract
             return null;
         }
 
-        if ($node instanceof Interface_ || $node instanceof Enum_) {
-            assert(!is_null($node->name));
+        if ($node instanceof Interface_ || $node instanceof Enum_ || $node instanceof Trait_) {
+            assert(!is_null($node->name), sprintf('💥 %s', get_debug_type($node)));
             Assert::that(
                 is_null($this->className),
                 sprintf('Make sure "%s" contains only 1 class per file!', $this->filePath)

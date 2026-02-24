@@ -6,12 +6,16 @@ namespace Tactix;
 
 final readonly class Check
 {
+    public function __construct(private YieldViolations $yieldViolations)
+    {
+    }
+
     /**
      * @param class-string $className
      */
-    public static function className(string $className): void
+    public function className(string $className): void
     {
-        $violations = iterator_to_array(YieldViolations::fromClassName($className));
+        $violations = iterator_to_array($this->yieldViolations->fromClassName($className));
 
         if (!empty($violations)) {
             throw new ClassViolationException($className, $violations);
@@ -21,9 +25,9 @@ final readonly class Check
     /**
      * @param non-empty-string $folder
      */
-    public static function folder(string $folder): void
+    public function folder(string $folder): void
     {
-        $violations = iterator_to_array(YieldViolations::fromFolder($folder));
+        $violations = iterator_to_array($this->yieldViolations->fromFolder($folder));
 
         if (!empty($violations)) {
             throw new FolderViolationException($folder, $violations);

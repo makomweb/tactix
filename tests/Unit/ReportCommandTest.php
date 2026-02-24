@@ -11,6 +11,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Tactix\BlacklistFactory;
 use Tactix\Command\ReportCommand;
 
 final class ReportCommandTest extends TestCase
@@ -40,7 +41,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_succeed_with_valid_folder(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -58,7 +59,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_generate_report_files(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -77,7 +78,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_generate_valid_report_js(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -99,7 +100,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_generate_valid_html_structure(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -124,7 +125,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_use_current_directory_when_no_out_dir_specified(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         // Change to temp directory before running command
@@ -146,7 +147,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_display_uncategorized_classes_when_present(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -162,7 +163,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_complete_successfully_and_show_sections(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';
@@ -181,7 +182,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_create_output_directory_if_not_exists(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $nonExistentDir = $this->tempDir.'/nested/path/that/does/not/exist';
@@ -200,7 +201,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_fail_gracefully_with_exception(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         // Use a non-existent folder that will cause an error
@@ -218,7 +219,7 @@ final class ReportCommandTest extends TestCase
     #[Test]
     public function command_should_include_class_distribution_table(): void
     {
-        $command = new ReportCommand($this->createSerializer());
+        $command = new ReportCommand($this->createSerializer(), BlacklistFactory::load());
         $commandTester = new CommandTester($command);
 
         $folder = __DIR__.'/../Data';

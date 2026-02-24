@@ -6,6 +6,7 @@ namespace Tactix\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Tactix\Blacklist;
 
 final class Configuration implements ConfigurationInterface
 {
@@ -15,7 +16,13 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
         $rootNode->children()
-            ->scalarNode('some_option')->defaultNull()->end()
+            ->arrayNode('blacklist')
+                ->useAttributeAsKey('name')
+                ->arrayPrototype()
+                    ->scalarPrototype()->end()
+                ->end()
+                ->defaultValue(Blacklist::DEFAULT_DATA)
+            ->end()
         ->end();
 
         return $treeBuilder;

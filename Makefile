@@ -19,3 +19,13 @@ test:
 
 shell:
 	@docker compose exec -it $(CONTAINER_NAME) sh
+
+maintain: show-composer-updates update-composer-dependencies
+
+show-composer-updates:
+	@echo "Show whether composer dependencies are outdated"
+	@docker compose exec -it $(CONTAINER_NAME) composer show --outdated
+	
+update-composer-dependencies:
+	@echo "Update dependencies"
+	@docker compose exec -it $(CONTAINER_NAME) composer update -W

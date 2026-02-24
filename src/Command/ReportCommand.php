@@ -24,6 +24,7 @@ use Tactix\Analyzer\RelationReducer;
 use Tactix\Analyzer\YieldNodes;
 use Tactix\Analyzer\YieldRelations;
 use Tactix\AttributeNameFactory;
+use Tactix\Blacklist;
 use Tactix\IgnoreableTypes;
 use Tactix\TactixException;
 
@@ -33,8 +34,10 @@ use Tactix\TactixException;
 )]
 final class ReportCommand extends Command
 {
-    public function __construct(private readonly SerializerInterface $serializer)
-    {
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly Blacklist $blacklist,
+    ) {
         parent::__construct();
     }
 
@@ -146,7 +149,7 @@ final class ReportCommand extends Command
                     ignoreTypes: IgnoreableTypes::VALUES),
                 []
             ),
-            static fn (array $descriptions, Relation $relation) => $relation->isForbidden()
+            fn (array $descriptions, Relation $relation) => $this->blacklist->isForbidden($relation)
                     ? [...$descriptions, $relation->getDescription()]
                     : $descriptions,
             []

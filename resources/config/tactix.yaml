@@ -1,0 +1,20 @@
+tactix:
+    blacklist:
+        Entity:
+            - Factory
+            - Service
+            - AggregateRoot
+        ValueObject:
+            - Entity
+            - AggregateRoot
+            - Repository
+            - Factory
+            - Service
+        AggregateRoot:
+            - Factory
+        Repository:
+            - Factory
+            - Service
+        Factory:
+            - Repository
+        Service: []

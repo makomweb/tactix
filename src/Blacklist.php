@@ -1,0 +1,98 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tactix;
+
+use Tactix\Analyzer\Relation;
+
+final readonly class Blacklist
+{
+    public const DEFAULT_DATA = [
+        'Entity' => [
+            'Factory',
+            'Service',
+            'AggregateRoot',
+        ],
+        'ValueObject' => [
+            'Entity',
+            'AggregateRoot',
+            'Repository',
+            'Factory',
+            'Service',
+        ],
+        'AggregateRoot' => ['Factory'],
+        'Repository' => ['Factory', 'Service'],
+        'Factory' => ['Repository'],
+        'Service' => [],
+    ];
+
+    /** @var array<int, array{from: AttributeName, to: AttributeName[]}> */
+    private array $rules;
+
+    /**
+     * Create a new Blacklist instance.
+     * Format: ['FROM_ATTRIBUTE' => ['TO_ATTRIBUTE1', 'TO_ATTRIBUTE2'], ...]
+     * Attribute names should match AttributeName enum values.
+     *
+     * @param array<string, array<string>> $data
+     */
+    public function __construct(array $data)
+    {
+        assert(!empty($data));
+        $this->rules = self::buildRules($data);
+    }
+
+    public function isForbidden(Relation $relation): bool
+    {
+        $from = $relation->getFromAttribute();
+        $to = $relation->getToAttribute();
+
+        return $from && $to && $this->check($from, $to);
+    }
+
+    /**
+     * Check if a relation from $from to $to is forbidden.
+     *
+     * @throws \LogicException If the from attribute has no blacklist entry
+     */
+    private function check(AttributeName $from, AttributeName $to): bool
+    {
+        foreach ($this->rules as $rule) {
+            if ($rule['from'] === $from) {
+                return in_array($to, $rule['to'], true);
+            }
+        }
+
+        throw new \LogicException(sprintf('Add an entry for %s to the blacklist!', $from->value));
+    }
+
+    /**
+     * Build rules from configuration, converting string names to AttributeName enums.
+     *
+     * @param array<string, array<string>> $data
+     *
+     * @return array<int, array{from: AttributeName, to: AttributeName[]}>
+     */
+    private static function buildRules(array $data): array
+    {
+        $rules = [];
+        foreach ($data as $fromValue => $toValues) {
+            try {
+                $from = AttributeName::from($fromValue);
+                $to = array_map(
+                    static fn (string $value) => AttributeName::from($value),
+                    $toValues
+                );
+                $rules[] = [
+                    'from' => $from,
+                    'to' => $to,
+                ];
+            } catch (\ValueError $e) {
+                throw new \LogicException(sprintf('Invalid attribute name in blacklist: %s', $e->getMessage()), 0, $e);
+            }
+        }
+
+        return $rules;
+    }
+}
