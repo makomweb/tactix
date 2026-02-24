@@ -23,7 +23,7 @@ shell:
 maintain: show-composer-updates update-composer-dependencies
 
 show-composer-updates:
-	@echo "Show wether composer dependencies are outdated"
+	@echo "Show whether composer dependencies are outdated"
 	@docker compose exec -it $(CONTAINER_NAME) composer show --outdated
 	
 update-composer-dependencies:
