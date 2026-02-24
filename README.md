@@ -185,7 +185,7 @@ Tactix can be integrated into Laravel projects with a custom service provider.
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Yaml\Yaml;
+use Tactix\Blacklist;
 use Tactix\BlacklistFactory;
 
 class BlacklistProvider extends ServiceProvider
@@ -196,7 +196,7 @@ class BlacklistProvider extends ServiceProvider
             $configPath = config_path('tactix.yaml');
             
             return file_exists($configPath)
-              ? BlacklistFactory::fromYaml($configPath)
+              ? BlacklistFactory::fromYamlFile($configPath)
               : BlacklistFactory::DEFAULT();
         });
     }
