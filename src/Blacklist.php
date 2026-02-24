@@ -37,10 +37,10 @@ final readonly class Blacklist
      *
      * @param array<string, array<string>> $data
      */
-    public function __construct(public array $data)
+    public function __construct(array $data)
     {
         assert(!empty($data));
-        $this->rules = $this->buildRules($data);
+        $this->rules = self::buildRules($data);
     }
 
     public function isForbidden(Relation $relation): bool
@@ -74,7 +74,7 @@ final readonly class Blacklist
      *
      * @return array<int, array{from: AttributeName, to: AttributeName[]}>
      */
-    private function buildRules(array $data): array
+    private static function buildRules(array $data): array
     {
         $rules = [];
         foreach ($data as $fromValue => $toValues) {
