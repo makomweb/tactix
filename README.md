@@ -197,7 +197,7 @@ class BlacklistProvider extends ServiceProvider
             
             return file_exists($configPath)
               ? BlacklistFactory::fromYamlFile($configPath)
-              : BlacklistFactory::DEFAULT();
+              : BlacklistFactory::default();
         });
     }
 }
