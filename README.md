@@ -88,7 +88,7 @@ Notes:
 
 ## Framework Integration
 
-Tactix is framework-agnostic. The core package has zero framework dependencies. Here's how to configure it in different environments.
+Tactix is framework-agnostic. The core package does not depend on any specific full-stack framework and can be integrated into different environments.
 
 ### Symfony
 
