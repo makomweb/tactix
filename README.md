@@ -46,7 +46,9 @@ final class User {}
 ### 2. Either Check your classes or folders manually
 
 ```php
+use Tactix\Blacklist;
 use Tactix\Check;
+use Tactix\YieldViolations;
 
 $check = new Check(new YieldViolations(new Blacklist(Blacklist::DEFAULT_DATA)));
 $check->className(User::class);
