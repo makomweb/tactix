@@ -28,7 +28,7 @@ final readonly class YieldViolations
 
         /* Check that all classes have a tactical tag. Yield a violation if not. */
         foreach (YieldClassNames::for($folder) as $className) {
-            yield from self::fromClassName($className);
+            yield from $this->fromClassName($className);
         }
 
         /* Yield a violation for every forbidden relation within this folder. */
