@@ -252,6 +252,7 @@ For CLI scripts or standalone applications:
 
 ```php
 use Tactix\Blacklist;
+use Tactix\BlacklistFactory;
 use Tactix\Check;
 use Tactix\YieldViolations;
 use Symfony\Component\Yaml\Yaml;
