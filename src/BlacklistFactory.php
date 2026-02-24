@@ -9,7 +9,7 @@ use Tactix\Assert\Assert;
 
 final class BlacklistFactory
 {
-    public static function DEFAULT(): Blacklist
+    public static function default(): Blacklist
     {
         return new Blacklist(Blacklist::DEFAULT_DATA);
     }
