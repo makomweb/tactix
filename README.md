@@ -9,6 +9,46 @@ Tactical DDD, simplified for PHP. Tag your classes via PHP attributes and analyz
   <img src="./assets/logo.png" alt="project-logo" width="300"/>
 </p>
 
+## Architecture
+
+```
+┌─────────────────────────────────┐
+│    Project Source Code          │
+│    (tagged PHP classes)         │
+└────────────────┬────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────┐
+│    Analyzer Layer               │
+│    (PhpFileAnalyzer, AST)       │
+└────────────────┬────────────────┘
+                 │
+         ┌───────┴────────┐
+         ▼                ▼
+┌──────────────┐  ┌──────────────────┐
+│   Relation   │  │  Rule Engine     │
+│   Extractor  │◄─┤  (Blacklist)     │
+│ (Violations) │  │  (YAML/DI)       │
+└──────┬───────┘  └──────────────────┘
+       │
+       ▼
+┌──────────────────────────────────┐
+│       Check API                  │
+│  • Check::className()            │
+│  • Check::folder()               │
+│    (throws on violations)        │
+└────────────┬─────────────────────┘
+             │
+     ┌───────┼────────┐
+     ▼       ▼        ▼
+┌─────────┐ ┌──────┐ ┌──────────┐
+│   CLI   │ │ HTML │ │Framework │
+│ Command │ │Report│ │ Bundles  │
+└─────────┘ └──────┘ └──────────┘
+```
+
+Flow: Tagged source code → AST analysis → Rule validation → Check API → Output (CLI/Report/Framework)
+
 ## Installation
 
 ```bash
