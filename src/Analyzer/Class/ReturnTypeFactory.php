@@ -6,6 +6,7 @@ namespace Tactix\Analyzer\Class;
 
 use PhpParser\Node\Identifier;
 use PhpParser\Node\IntersectionType;
+use PhpParser\Node\Name as PhpParserNodeName;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\UnionType;
@@ -34,7 +35,7 @@ final readonly class ReturnTypeFactory
         }
 
         $returnType = $method->returnType;
-        if ($returnType instanceof Identifier || $returnType instanceof \PhpParser\Node\Name || $returnType instanceof NullableType) {
+        if ($returnType instanceof Identifier || $returnType instanceof PhpParserNodeName || $returnType instanceof NullableType) {
             return self::fromString(
                 (string) ($returnType instanceof NullableType ? $returnType->type : $returnType),
                 $returnType instanceof NullableType,
@@ -43,8 +44,26 @@ final readonly class ReturnTypeFactory
             );
         }
 
-        if ($returnType instanceof UnionType || $returnType instanceof IntersectionType) {
-            return ReturnType::unknown();
+        if ($returnType instanceof UnionType) {
+            $types = array_map(
+                static function (Identifier|IntersectionType|PhpParserNodeName $returnTypeItem) {
+                    assert($returnTypeItem instanceof Identifier || $returnTypeItem instanceof PhpParserNodeName);
+
+                    return new Name($returnTypeItem->name, NameType::UNKNOWN);
+                },
+                $returnType->types
+            );
+
+            return ReturnType::union($types);
+        }
+
+        if ($returnType instanceof IntersectionType) {
+            $types = array_map(
+                static fn ($type) => new Name($type->name, NameType::UNKNOWN),
+                $returnType->types
+            );
+
+            return ReturnType::intersection($types);
         }
 
         throw new \LogicException(sprintf('"%s" (unknown type) is not supported', get_debug_type($returnType)));
