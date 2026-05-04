@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tactix\Analyzer\Class;
 
 use PhpParser\Node\Identifier;
+use PhpParser\Node\IntersectionType;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\UnionType;
 use Tactix\Analyzer\DocTypeExtractor;
 
 final readonly class ReturnTypeFactory
@@ -41,7 +43,11 @@ final readonly class ReturnTypeFactory
             );
         }
 
-        throw new \LogicException(sprintf('"%s" (unions and intersections) are not supported', get_debug_type($returnType)));
+        if ($returnType instanceof UnionType || $returnType instanceof IntersectionType) {
+            return ReturnType::unknown();
+        }
+
+        throw new \LogicException(sprintf('"%s" (unknown type) is not supported', get_debug_type($returnType)));
     }
 
     private static function getDocBlockReturnType(ClassMethod $method): ?string
