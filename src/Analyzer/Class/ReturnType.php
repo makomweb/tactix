@@ -6,9 +6,15 @@ namespace Tactix\Analyzer\Class;
 
 final readonly class ReturnType implements \Stringable
 {
+    /**
+     * @param Name[] $unionTypes
+     * @param Name[] $intersectionTypes
+     */
     private function __construct(
         public ReturnTypeKind $kind,
         public ?Name $typeName = null,
+        public array $unionTypes = [],
+        public array $intersectionTypes = [],
     ) {
     }
 
@@ -27,14 +33,28 @@ final readonly class ReturnType implements \Stringable
         return new self(ReturnTypeKind::REGULAR, $typeName);
     }
 
-    public static function union(Name $typeName): self
+    /**
+     * @param Name[] $types
+     */
+    public static function union(array $types): self
     {
-        return new self(ReturnTypeKind::UNION, $typeName);
+        return new self(
+            kind: ReturnTypeKind::UNION,
+            typeName: new Name(implode('|', $types), NameType::UNKNOWN),
+            unionTypes: $types
+        );
     }
 
-    public static function intersection(Name $typeName): self
+    /**
+     * @param Name[] $types
+     */
+    public static function intersection(array $types): self
     {
-        return new self(ReturnTypeKind::INTERSECTION, $typeName);
+        return new self(
+            kind: ReturnTypeKind::INTERSECTION,
+            typeName: new Name(implode('&', $types), NameType::UNKNOWN),
+            intersectionTypes: $types
+        );
     }
 
     public static function nullable(Name $typeName): self
@@ -59,7 +79,7 @@ final readonly class ReturnType implements \Stringable
 
     public function isGenerator(): bool
     {
-        return $this->typeName?->isGenerator() ?? false;
+        return ReturnTypeKind::GENERATOR === $this->kind || ($this->typeName?->isGenerator() ?? false);
     }
 
     public function isNullable(): bool
@@ -75,6 +95,16 @@ final readonly class ReturnType implements \Stringable
     public function isVoid(): bool
     {
         return ReturnTypeKind::VOID === $this->kind;
+    }
+
+    public function isUnion(): bool
+    {
+        return ReturnTypeKind::UNION === $this->kind;
+    }
+
+    public function isIntersection(): bool
+    {
+        return ReturnTypeKind::INTERSECTION === $this->kind;
     }
 
     public function canBeIgnored(): bool
@@ -96,6 +126,8 @@ final readonly class ReturnType implements \Stringable
             match ($this->kind) {
                 ReturnTypeKind::VOID => 'void',
                 ReturnTypeKind::UNKNOWN => 'unknown',
+                ReturnTypeKind::UNION => implode('|', array_map(fn (Name $n) => (string) $n, $this->unionTypes)),
+                ReturnTypeKind::INTERSECTION => implode('&', array_map(fn (Name $n) => (string) $n, $this->intersectionTypes)),
                 default => (string) $this->typeName,
             },
             $this->isCollection() ? '[]' : ''
