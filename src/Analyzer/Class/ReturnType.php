@@ -51,7 +51,7 @@ final readonly class ReturnType implements \Stringable
     public static function intersection(array $types): self
     {
         return new self(
-            kind: ReturnTypeKind::UNION,
+            kind: ReturnTypeKind::INTERSECTION,
             typeName: new Name(implode('&', $types), NameType::UNKNOWN),
             intersectionTypes: $types
         );
@@ -79,7 +79,7 @@ final readonly class ReturnType implements \Stringable
 
     public function isGenerator(): bool
     {
-        return $this->typeName?->isGenerator() ?? false;
+        return ReturnTypeKind::GENERATOR === $this->kind || ($this->typeName?->isGenerator() ?? false);
     }
 
     public function isNullable(): bool
@@ -99,15 +99,11 @@ final readonly class ReturnType implements \Stringable
 
     public function isUnion(): bool
     {
-        assert(!empty($this->unionTypes));
-
         return ReturnTypeKind::UNION === $this->kind;
     }
 
     public function isIntersection(): bool
     {
-        assert(!empty($this->intersectionTypes));
-
         return ReturnTypeKind::INTERSECTION === $this->kind;
     }
 

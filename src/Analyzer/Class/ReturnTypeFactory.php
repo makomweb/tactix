@@ -94,14 +94,14 @@ final readonly class ReturnTypeFactory
                 return ReturnType::collection(new Name($collectionDocType, NameType::UNKNOWN));
             }
 
-            return ReturnType::unknown();
+            return ReturnType::collection(new Name($typeName, NameType::UNKNOWN));
         }
         if ('generator' === $collectionOrGenerator) {
             if (null !== $generatorDocType) {
                 return ReturnType::generator(new Name($generatorDocType, NameType::UNKNOWN));
             }
 
-            return ReturnType::unknown();
+            return ReturnType::generator(new Name($typeName, NameType::UNKNOWN));
         }
 
         return $nullable
