@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Check for PHP dependency updates (composer.json)
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "makomweb"
+    allow:
+      - dependency-type: "production"
+      - dependency-type: "development"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "/"

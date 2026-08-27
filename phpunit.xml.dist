@@ -16,8 +16,6 @@
         <server name="SHELL_VERBOSITY" value="1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
-        <ini name="xdebug.mode" value="coverage"/>
-        <ini name="xdebug.start_with_request" value="yes"/>
     </php>
 
     <testsuites>
